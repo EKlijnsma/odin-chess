@@ -1,9 +1,9 @@
-require_relative 'lib/rook'
-require_relative 'lib/knight'
-require_relative 'lib/bishop'
-require_relative 'lib/king'
-require_relative 'lib/queen'
-require_relative 'lib/pawn'
+require_relative 'rook'
+require_relative 'knight'
+require_relative 'bishop'
+require_relative 'king'
+require_relative 'queen'
+require_relative 'pawn'
 
 class Board
   attr_accessor :state
@@ -26,11 +26,21 @@ class Board
     end
   end
 
-  def validate_selection(piece, player)
-    # TODO
+  def piece_at(coords)
+    @state[coords[0]][coords[1]]
   end
 
-  def validate_destination(piece, destination)
+  def validate_selection(coords, player)
+    piece = piece_at(coords)
+    # if nil there is no piece here, otherwise verify that the piece is the same color as the player
+    piece.nil? ? false : piece.color == player.color
+  end
+
+  def validate_destination(piece_coords, destination_coords)
     # TODO
+    # Test 1: is the destination a valid movement for the piece? (check the possible moves method for the piece)
+    # Test 2: is the destination not occupied by a same color piece?
+    # Test 3: is the path not blocked?
+    # Test 4: is the move not resulting in a check of the own king?
   end
 end
