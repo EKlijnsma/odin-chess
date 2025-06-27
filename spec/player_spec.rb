@@ -18,4 +18,21 @@ describe Player do
       end
     end
   end
+
+  describe '#chess_square?' do
+    valid_inputs = %w[a1 e5 h8]
+    invalid_inputs = %w[a0 j3 ab 12 cancel]
+
+    valid_inputs.each do |input|
+      it "returns true for #{input}" do
+        expect(player.chess_square?(input)).to be(true)
+      end
+    end
+
+    invalid_inputs.each do |input|
+      it "returns false for #{input}" do
+        expect(player.chess_square?(input)).to be(false)
+      end
+    end
+  end
 end
