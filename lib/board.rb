@@ -32,13 +32,25 @@ class Board
     @state[coords[0]][coords[1]]
   end
 
+  def execute_move(from, to)
+    # get piece
+    piece = @state[from[0]][from[1]]
+
+    # move piece to target
+    @state[to[0]][to[1]] = piece
+
+    # empty starting square
+    @state[from[0]][from[1]] = nil
+  end
+
   def validate_selection(coords, player)
     piece = piece_at(coords)
     # if nil there is no piece here, otherwise verify that the piece is the same color as the player
     piece.nil? ? false : piece.color == player.color
   end
 
-  def validate_destination(piece_coords, destination_coords)
+  def validate_destination(_piece_coords, _destination_coords)
+    true
     # TODO
     # Test 1: is the destination a valid movement for the piece? (check the possible moves method for the piece)
     # Test 2: is the destination not occupied by a same color piece?
