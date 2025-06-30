@@ -15,4 +15,10 @@ class Piece
   def to_s
     @symbol
   end
+
+  def valid_move?(piece_coords, destination_coords)
+    row_delta = destination_coords[0] - piece_coords[0]
+    col_delta = destination_coords[1] - piece_coords[1]
+    possible_moves.include?([row_delta, col_delta])
+  end
 end
