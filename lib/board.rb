@@ -43,4 +43,46 @@ class Board
     # Test 3: is the path not blocked?
     # Test 4: is the move not resulting in a check of the own king?
   end
+
+  def render
+    clear_screen
+    print_bar
+    @state.each_with_index do |rank, i|
+      print_row(rank, i)
+      print_bar
+    end
+    print_file_labels(%w[A B C D E F G H])
+  end
+
+  private
+
+  def clear_screen
+    puts `clear`
+  end
+
+  def print_row(rank, i)
+    string = "#{8 - i} |"
+    rank.each do |piece|
+      string += piece.nil? ? '   |' : " #{piece} |"
+    end
+    puts string
+  end
+
+  def print_file_labels(files)
+    string = '  '
+    files.each do |file|
+      string += "  #{file} "
+    end
+    puts string
+  end
+
+  def print_bar
+    puts "  #{'+---' * 8}+"
+  end
+
+  # Next steps:
+  # 1 - Board rendering (keep it simple, can always make it more fancy later)
+  # 2 - Move execution (simply update the board state)
+  # 3 - Turn logic in the Game class, prompt for a move, execute move
+  # 4 - Game logic or validation logic (similar)
 end

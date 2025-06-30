@@ -9,4 +9,8 @@ class Piece
   def possible_moves
     raise NotImplementedError, 'Subclasses must implement possible_moves'
   end
+
+  def to_s
+    @symbol
+  end
 end
