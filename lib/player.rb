@@ -32,4 +32,8 @@ class Player
     # returning a boolean indicating if the string represents a valid chess square
     !!string.match(/^[a-h][1-8]$/)
   end
+
+  def to_s
+    @name
+  end
 end

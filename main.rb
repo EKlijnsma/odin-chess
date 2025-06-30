@@ -6,7 +6,6 @@ emiel = Player.new('Emiel', :white)
 renee = Player.new('Renee', :black)
 board = Board.new
 
-game = Game.new(emiel, renee, board)
+game = Game.new(board, emiel, renee)
 
-board.render
-# game.play
+game.play

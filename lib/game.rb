@@ -11,6 +11,40 @@ class Game
     @current_player = player1
   end
 
+  def play
+    loop do
+      take_turn(@current_player)
+      break if game_over?
+
+      switch_players
+    end
+    announce_result
+  end
+
+  def take_turn(player)
+    @board.render
+    puts "#{player}'s turn"
+    move = get_move(player)
+    @board.execute_move(move[0], move[1])
+    @board.render
+  end
+
+  def announce_result
+    # TODO
+  end
+
+  def switch_players
+    @current_player = if @current_player == player1
+                        player2
+                      else
+                        player1
+                      end
+  end
+
+  def game_over?
+    # TODO
+  end
+
   def get_move(player)
     piece_coords = select_valid_piece(player)
     destination_coords = select_valid_destination(player, piece_coords)
