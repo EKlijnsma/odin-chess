@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'bishop'
 require_relative 'board_renderer'
 require_relative 'king'
@@ -57,10 +59,4 @@ class Board
     # Test 3: is the path not blocked?
     # Test 4: is the move not resulting in a check of the own king?
   end
-
-  # Next steps:
-  # 1 - Board rendering (keep it simple, can always make it more fancy later)
-  # 2 - Move execution (simply update the board state)
-  # 3 - Turn logic in the Game class, prompt for a move, execute move
-  # 4 - Game logic or validation logic (similar)
 end
