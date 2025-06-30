@@ -1,11 +1,13 @@
-require_relative 'rook'
-require_relative 'knight'
 require_relative 'bishop'
+require_relative 'board_renderer'
 require_relative 'king'
-require_relative 'queen'
+require_relative 'knight'
 require_relative 'pawn'
+require_relative 'queen'
+require_relative 'rook'
 
 class Board
+  include BoardRenderer
   attr_accessor :state
 
   def initialize
@@ -42,42 +44,6 @@ class Board
     # Test 2: is the destination not occupied by a same color piece?
     # Test 3: is the path not blocked?
     # Test 4: is the move not resulting in a check of the own king?
-  end
-
-  def render
-    clear_screen
-    print_bar
-    @state.each_with_index do |rank, i|
-      print_row(rank, i)
-      print_bar
-    end
-    print_file_labels(%w[A B C D E F G H])
-  end
-
-  private
-
-  def clear_screen
-    puts `clear`
-  end
-
-  def print_row(rank, i)
-    string = "#{8 - i} |"
-    rank.each do |piece|
-      string += piece.nil? ? '   |' : " #{piece} |"
-    end
-    puts string
-  end
-
-  def print_file_labels(files)
-    string = '  '
-    files.each do |file|
-      string += "  #{file} "
-    end
-    puts string
-  end
-
-  def print_bar
-    puts "  #{'+---' * 8}+"
   end
 
   # Next steps:
