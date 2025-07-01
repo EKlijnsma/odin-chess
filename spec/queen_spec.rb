@@ -14,4 +14,16 @@ describe Queen do
       expect(queen.possible_moves).to match_array(expected)
     end
   end
+
+  describe '#valid_move?' do
+    it 'returns true for vertical, horizontal, and diagonal moves' do
+      expect(queen.valid_move?([5, 5], [5, 0])).to be true
+      expect(queen.valid_move?([5, 5], [2, 2])).to be true
+    end
+
+    it 'returns false for invalid queen moves' do
+      expect(queen.valid_move?([5, 5], [6, 3])).to be false
+      expect(queen.valid_move?([5, 5], [4, 7])).to be false
+    end
+  end
 end

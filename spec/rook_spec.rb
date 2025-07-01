@@ -12,4 +12,16 @@ describe Rook do
       expect(rook.possible_moves).to match_array(expected)
     end
   end
+
+  describe '#valid_move?' do
+    it 'returns true for horizontal and vertical moves' do
+      expect(rook.valid_move?([5, 5], [5, 0])).to be true
+      expect(rook.valid_move?([5, 5], [0, 5])).to be true
+    end
+  
+    it 'returns false for diagonal moves' do
+      expect(rook.valid_move?([5, 5], [6, 6])).to be false
+      expect(rook.valid_move?([5, 5], [4, 4])).to be false
+    end
+  end
 end

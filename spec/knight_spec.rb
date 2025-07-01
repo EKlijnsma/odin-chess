@@ -26,4 +26,18 @@ describe Knight do
       expect(black_knight.symbol).to eq('♞')
     end
   end
+
+  describe '#valid_move?' do
+    subject(:white_knight) { described_class.new(:white) }
+    
+    it 'returns true for valid L-shaped moves' do
+      expect(white_knight.valid_move?([5, 5], [7, 6])).to be true
+      expect(white_knight.valid_move?([5, 5], [6, 7])).to be true
+    end
+  
+    it 'returns false for non L-shaped moves' do
+      expect(white_knight.valid_move?([5, 5], [5, 6])).to be false
+      expect(white_knight.valid_move?([5, 5], [4, 4])).to be false
+    end
+  end
 end

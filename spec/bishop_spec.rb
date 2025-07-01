@@ -12,4 +12,16 @@ describe Bishop do
       expect(bishop.possible_moves).to match_array(expected)
     end
   end
+
+  describe '#valid_move?' do
+    it 'returns true for diagonal moves' do
+      expect(bishop.valid_move?([5, 5], [7, 7])).to be true
+      expect(bishop.valid_move?([5, 5], [3, 3])).to be true
+    end
+
+    it 'returns false for non-diagonal moves' do
+      expect(bishop.valid_move?([5, 5], [5, 6])).to be false
+      expect(bishop.valid_move?([5, 5], [6, 5])).to be false
+    end
+  end
 end

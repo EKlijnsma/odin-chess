@@ -14,4 +14,18 @@ describe King do
       expect(king.possible_moves).to match_array(expected)
     end
   end
+
+  describe '#valid_move?' do
+    let(:king) { King.new(:white) }
+
+    it 'returns true for a valid king move' do
+      expect(king.valid_move?([5, 5], [4, 5])).to be true
+      expect(king.valid_move?([5, 5], [6, 6])).to be true
+    end
+
+    it 'returns false for an invalid king move' do
+      expect(king.valid_move?([5, 5], [7, 6])).to be false
+      expect(king.valid_move?([5, 5], [3, 5])).to be false
+    end
+  end
 end
