@@ -62,7 +62,7 @@ class Board
     condition3 = clear_path?(piece_coords, destination_coords)
 
     # Test 4: is the move not resulting in a check of the own king?
-    # TODO
+    condition4 = results_in_check?(from, to)
 
     # Test 5: when en passant, is it allowed?
     # TODO
@@ -72,6 +72,13 @@ class Board
 
     condition1 && condition2 && condition3
   end
+
+  def results_in_check?(from, to)
+    # Clone the board
+    # execute the move
+    # king in check?
+  end
+
 
   def friendly_fire?(piece_coords, destination_coords)
     moving_piece = piece_at(piece_coords)
