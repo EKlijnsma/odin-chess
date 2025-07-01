@@ -38,5 +38,22 @@ describe Pawn do
       expect(white_pawn.valid_move?([6, 0], [6, 1])).to be false
     end
   end
-  
+
+  describe '#target' do
+    let(:white_pawn) { Pawn.new(:white) }
+    let(:black_pawn) { Pawn.new(:black) }
+    it 'returns diagonal attack targets for white' do
+      position = [4, 4]
+      targets = white_pawn.targets(position)
+
+      expect(targets).to match_array([[3, 3], [3, 5]])
+    end
+
+    it 'returns diagonal attack targets for black' do
+      position = [4, 4]
+      targets = black_pawn.targets(position)
+
+      expect(targets).to match_array([[5, 3], [5, 5]])
+    end
+  end
 end

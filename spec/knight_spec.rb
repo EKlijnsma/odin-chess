@@ -29,15 +29,30 @@ describe Knight do
 
   describe '#valid_move?' do
     subject(:white_knight) { described_class.new(:white) }
-    
+
     it 'returns true for valid L-shaped moves' do
       expect(white_knight.valid_move?([5, 5], [7, 6])).to be true
       expect(white_knight.valid_move?([5, 5], [6, 7])).to be true
     end
-  
+
     it 'returns false for non L-shaped moves' do
       expect(white_knight.valid_move?([5, 5], [5, 6])).to be false
       expect(white_knight.valid_move?([5, 5], [4, 4])).to be false
+    end
+  end
+
+  describe '#target' do
+    subject(:white_knight) { described_class.new(:white) }
+    it 'returns all valid L-shaped targets from the center' do
+      position = [4, 4]
+      targets = white_knight.targets(position)
+
+      expected = [
+        [2, 3], [2, 5], [3, 2], [3, 6],
+        [5, 2], [5, 6], [6, 3], [6, 5]
+      ]
+
+      expect(targets).to match_array(expected)
     end
   end
 end

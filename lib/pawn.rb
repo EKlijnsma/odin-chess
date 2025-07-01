@@ -19,4 +19,18 @@ class Pawn < Piece
       [single, 1], [single, -1]
     ]
   end
+
+  def targets(position)
+    targets = []
+    possible_moves.each do |vector|
+      next if vector[1].zero?
+
+      row = vector[0] + position[0]
+      col = vector[1] + position[1]
+      next unless row.between?(0, 7) && col.between?(0, 7)
+
+      targets << [row, col]
+    end
+    targets
+  end
 end

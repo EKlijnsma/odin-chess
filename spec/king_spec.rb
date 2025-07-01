@@ -28,4 +28,19 @@ describe King do
       expect(king.valid_move?([5, 5], [3, 5])).to be false
     end
   end
+
+  describe '#target' do
+    it 'returns all adjacent squares from the center' do
+      position = [4, 4]
+      targets = king.targets(position)
+
+      expected = [
+        [3, 3], [3, 4], [3, 5],
+        [4, 3],         [4, 5],
+        [5, 3], [5, 4], [5, 5]
+      ]
+
+      expect(targets).to match_array(expected)
+    end
+  end
 end
