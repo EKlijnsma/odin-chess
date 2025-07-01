@@ -130,7 +130,7 @@ describe Board do
     before do
       board.clear_board
     end
-    
+
     it 'returns true for clear diagonal path' do
       expect(board.clear_path?([0, 0], [3, 3])).to be true
     end
@@ -164,6 +164,48 @@ describe Board do
 
     it 'returns true when from and to are same (no path)' do
       expect(board.clear_path?([4, 4], [4, 4])).to be true
+    end
+  end
+
+  describe '#deep_clone' do
+    it 'returns a new Board object with an independent copy of the state' do
+      clone = board.deep_clone
+
+      # Ensure it's a different object
+      expect(clone).not_to equal(board)
+
+      # Ensure the state is duplicated (not shallow copied)
+      expect(clone.state).not_to equal(board.state)
+
+      # Mutating the clone should not affect the original
+      clone.state[0][0] = nil
+      expect(board.state[0][0]).not_to be_nil
+    end
+
+    it 'copies the pieces correctly' do
+      clone = board.deep_clone
+
+      original_piece = board.state[0][4]
+      cloned_piece = clone.state[0][4]
+
+      expect(cloned_piece).to be_a(original_piece.class)
+      expect(cloned_piece.color).to eq(original_piece.color)
+      expect(cloned_piece).not_to equal(original_piece)
+    end
+  end
+
+  describe '#find_king' do
+    it 'finds the white king in its initial position' do
+      expect(board.find_king(:white)).to eq([7, 4])
+    end
+
+    it 'finds the black king in its initial position' do
+      expect(board.find_king(:black)).to eq([0, 4])
+    end
+
+    it 'returns nil if the king is not on the board' do
+      board.state[0][4] = nil
+      expect(board.find_king(:black)).to be_nil
     end
   end
 end

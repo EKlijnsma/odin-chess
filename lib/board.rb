@@ -75,10 +75,54 @@ class Board
 
   def results_in_check?(from, to)
     # Clone the board
+    clone = deep_clone
+
     # execute the move
+    clone.execute_move(from, to)
+
     # king in check?
+    color = piece_at(from).color
+    clone.in_check?(color)
   end
 
+  def in_check?(color)
+    target = find_king(color)
+    opposing_color = color == :white ? :black : :white
+    # Find all targets for the opposing color
+    all_targets = get_all_targets(color)
+
+    # check if the kings square is in the all targets array
+    # account for blocking pieces
+    # TODO
+  end
+
+  def get_all_targets(color)
+    all_targets = []
+    @state.each_with_index do |row, i|
+      row.each_with_index do |piece, j|
+        next if piece.nil? || piece.color != color
+
+        targets = piece.targets([i, j])
+        # check blockades for sliding pieces. May want to give pieces an @sliding attribute
+        # which can be used to determine which validations need to be done
+        # TODO
+      end
+    end
+    all_targets
+  end
+
+  def find_king(color)
+    @state.each_with_index do |row, i|
+      row.each_with_index do |piece, j|
+        return [i, j] if piece.instance_of?(King) && piece.color == color
+      end
+    end
+    nil
+  end
+
+  def deep_clone
+    Marshal.load(Marshal.dump(self))
+  end
 
   def friendly_fire?(piece_coords, destination_coords)
     moving_piece = piece_at(piece_coords)
