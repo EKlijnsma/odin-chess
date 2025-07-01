@@ -92,4 +92,8 @@ class Board
     end
     true
   end
+
+  def clear_board
+    @state = Array.new(8) { Array.new(8) }
+  end
 end

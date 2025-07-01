@@ -74,4 +74,96 @@ describe Board do
       end
     end
   end
+
+  describe '#execute_move' do
+    it 'moves a piece from the from position to the to position' do
+      piece = Rook.new(:white)
+      board.state[0][0] = piece
+
+      board.execute_move([0, 0], [0, 3])
+
+      expect(board.state[0][0]).to be_nil
+      expect(board.state[0][3]).to eq(piece)
+    end
+
+    it 'overwrites the destination if occupied' do
+      white_rook = Rook.new(:white)
+      black_king = King.new(:black)
+      board.state[0][0] = white_rook
+      board.state[0][3] = black_king
+
+      board.execute_move([0, 0], [0, 3])
+
+      expect(board.state[0][0]).to be_nil
+      expect(board.state[0][3]).to eq(white_rook)
+    end
+  end
+
+  describe '#friendly_fire?' do
+    it 'returns true if destination has same-color piece' do
+      white_rook = Rook.new(:white)
+      white_king = King.new(:white)
+      board.state[0][0] = white_rook
+      board.state[0][1] = white_king
+
+      expect(board.friendly_fire?([0, 0], [0, 1])).to be true
+    end
+
+    it 'returns false if destination has opponent piece' do
+      white_rook = Rook.new(:white)
+      black_king = King.new(:black)
+      board.state[0][0] = white_rook
+      board.state[0][1] = black_king
+
+      expect(board.friendly_fire?([0, 0], [0, 1])).to be false
+    end
+
+    it 'returns false if destination is empty' do
+      white_rook = Rook.new(:white)
+      board.state[0][0] = white_rook
+
+      expect(board.friendly_fire?([0, 0], [0, 1])).to be false
+    end
+  end
+
+  describe '#clear_path?' do
+    before do
+      board.clear_board
+    end
+    
+    it 'returns true for clear diagonal path' do
+      expect(board.clear_path?([0, 0], [3, 3])).to be true
+    end
+
+    it 'returns false if diagonal path is blocked' do
+      board.state[1][1] = Knight.new(:black)
+      expect(board.clear_path?([0, 0], [3, 3])).to be false
+    end
+
+    it 'returns true for clear vertical path' do
+      expect(board.clear_path?([0, 0], [3, 0])).to be true
+    end
+
+    it 'returns false if vertical path is blocked' do
+      board.state[1][0] = Knight.new(:black)
+      expect(board.clear_path?([0, 0], [3, 0])).to be false
+    end
+
+    it 'returns true for clear horizontal path' do
+      expect(board.clear_path?([3, 0], [3, 5])).to be true
+    end
+
+    it 'returns false if horizontal path is blocked' do
+      board.state[3][2] = Bishop.new(:white)
+      expect(board.clear_path?([3, 0], [3, 5])).to be false
+    end
+
+    it 'returns true if from and to are adjacent' do
+      expect(board.clear_path?([4, 4], [4, 5])).to be true
+    end
+
+    it 'returns true when from and to are same (no path)' do
+      expect(board.clear_path?([4, 4], [4, 4])).to be true
+    end
+  end
 end
