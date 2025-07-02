@@ -33,4 +33,8 @@ class Piece
     end
     targets
   end
+
+  def sliding?
+    false
+  end
 end

@@ -58,11 +58,11 @@ class Board
     # Test 2: is the destination not occupied by a same color piece?
     condition2 = !friendly_fire?(piece_coords, destination_coords)
 
-    # Test 3: is the path not blocked?
-    condition3 = clear_path?(piece_coords, destination_coords)
+    # Test 3: is the path clear (not blocked)?
+    condition3 = piece_at(piece_coords).sliding? ? clear_path?(piece_coords, destination_coords) : true
 
     # Test 4: is the move not resulting in a check of the own king?
-    condition4 = results_in_check?(from, to)
+    results_in_check?(from, to)
 
     # Test 5: when en passant, is it allowed?
     # TODO
@@ -74,26 +74,17 @@ class Board
   end
 
   def results_in_check?(from, to)
-    # Clone the board
+    # Execute the move on a cloned board and evaluate if the king is in check
     clone = deep_clone
-
-    # execute the move
     clone.execute_move(from, to)
-
-    # king in check?
     color = piece_at(from).color
     clone.in_check?(color)
   end
 
   def in_check?(color)
-    target = find_king(color)
-    opposing_color = color == :white ? :black : :white
-    # Find all targets for the opposing color
-    all_targets = get_all_targets(color)
-
-    # check if the kings square is in the all targets array
-    # account for blocking pieces
-    # TODO
+    king_position = find_king(color)
+    enemy_color = (color == :white ? :black : :white)
+    get_all_targets(enemy_color).include?(king_position)
   end
 
   def get_all_targets(color)
@@ -102,10 +93,9 @@ class Board
       row.each_with_index do |piece, j|
         next if piece.nil? || piece.color != color
 
-        targets = piece.targets([i, j])
-        # check blockades for sliding pieces. May want to give pieces an @sliding attribute
-        # which can be used to determine which validations need to be done
-        # TODO
+        piece.targets([i, j]).each do |target|
+          all_targets << target unless piece.sliding? && !clear_path?([i, j], target)
+        end
       end
     end
     all_targets
@@ -146,5 +136,9 @@ class Board
 
   def clear_board
     @state = Array.new(8) { Array.new(8) }
+  end
+
+  def place_piece(piece, square)
+    @state[square[0]][square[1]] = piece
   end
 end
