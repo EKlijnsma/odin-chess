@@ -59,7 +59,7 @@ class Board
     return false if friendly_fire?(from, to)
     return false if piece.sliding? && !clear_path?
     return false if results_in_check?(from, to)
-    # return false if invalid en passant
+    # return false if invalid en passant capture
     # return false if illegal castling
   end
 
@@ -89,6 +89,20 @@ class Board
       end
     end
     all_targets
+  end
+
+  def get_all_moves(color)
+    all_moves = []
+    @state.each_with_index do |row, i|
+      row.each_with_index do |piece, j|
+        next if piece.nil? || piece.color != color
+
+        piece.targets([i, j]).each do |target|
+          all_moves << [[i, j], target] unless piece.sliding? && !clear_path?([i, j], target)
+        end
+      end
+    end
+    all_moves
   end
 
   def find_king(color)
