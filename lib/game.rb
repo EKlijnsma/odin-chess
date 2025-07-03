@@ -32,7 +32,7 @@ class Game
   end
 
   def announce_result
-    # TODO
+    # TODO -> winner if checkmate, else draw
   end
 
   def switch_players
@@ -44,7 +44,33 @@ class Game
   end
 
   def game_over?
+    next_player = (@current_player == @player1 ? @player2 : @player1)
+
+    checkmate?(next_player) || stalemate?(next_player) || threefold_repetition? || insufficient_material?
+  end
+
+  def stalemate?(player)
+    !@board.in_check?(player.color) && !has_legal_moves?(player)
+  end
+
+  def checkmate?(player)
+    @board.in_check?(player.color) && !has_legal_moves?(player)
+  end
+
+  def threefold_repetition?
     # TODO
+  end
+
+  def insufficient_material?
+    # TODO
+  end
+
+  def has_legal_moves?(player)
+    moves = @board.get_all_moves(player.color)
+    moves.each do |move|
+      return true if @board.validate_destination(move[0], move[1])
+    end
+    false
   end
 
   def get_move(player)
