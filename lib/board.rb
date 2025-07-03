@@ -51,26 +51,16 @@ class Board
     piece.nil? ? false : piece.color == player.color
   end
 
-  def validate_destination(piece_coords, destination_coords)
-    # Test 1: is the destination a valid movement for the piece? (check the possible moves method for the piece)
-    condition1 = piece_at(piece_coords).valid_move?(piece_coords, destination_coords)
-
-    # Test 2: is the destination not occupied by a same color piece?
-    condition2 = !friendly_fire?(piece_coords, destination_coords)
-
-    # Test 3: is the path clear (not blocked)?
-    condition3 = piece_at(piece_coords).sliding? ? clear_path?(piece_coords, destination_coords) : true
-
-    # Test 4: is the move not resulting in a check of the own king?
-    results_in_check?(from, to)
-
-    # Test 5: when en passant, is it allowed?
-    # TODO
-
-    # Test 6: when castling, is it allowed?
-    # TODO
-
-    condition1 && condition2 && condition3
+  def validate_destination(from, to)
+    piece = piece_at(from)
+    
+    return false if piece.nil?
+    return false unless piece.targets(from).include?(to)
+    return false if friendly_fire?(from, to)
+    return false if piece.sliding? && !clear_path?
+    return false if results_in_check?(from, to)
+    # return false if invalid en passant
+    # return false if illegal castling
   end
 
   def results_in_check?(from, to)

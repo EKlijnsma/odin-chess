@@ -209,4 +209,155 @@ describe Board do
       expect(board.find_king(:black)).to be_nil
     end
   end
+
+  describe '#get_all_targets' do
+    before do
+      board.clear_board
+    end
+
+    it 'returns correct targets for a knight' do
+      knight = double('Knight', color: :white, sliding?: false)
+      allow(knight).to receive(:targets).with([0, 0]).and_return([[2, 1], [1, 2]])
+
+      board.place_piece(knight, [0, 0])
+
+      expect(board.get_all_targets(:white)).to match_array([[2, 1], [1, 2]])
+    end
+
+    it 'does not include blocked targets for a rook' do
+      rook = double('Rook', color: :white, sliding?: true)
+      allow(rook).to receive(:targets).with([0, 0]).and_return([
+                                                                 [1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], # down
+                                                                 [0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [0, 7] # right
+                                                               ])
+
+      blocker = double('Blocker', color: :white, sliding?: false)
+      allow(blocker).to receive(:targets).with([3, 0]).and_return([])
+
+      board.place_piece(rook, [0, 0])
+      board.place_piece(blocker, [3, 0])
+
+      # assuming Board#get_all_targets removes [4,0] and beyond due to blocker at [3,0]
+      expect(board.get_all_targets(:white)).to include([1, 0], [2, 0], [3, 0])
+      expect(board.get_all_targets(:white)).not_to include([4, 0], [5, 0])
+    end
+
+    it 'returns combined targets from multiple white pieces' do
+      rook = double('Rook', color: :white, sliding?: true)
+      allow(rook).to receive(:targets).with([0, 0]).and_return([[1, 0], [2, 0]])
+
+      knight = double('Knight', color: :white, sliding?: false)
+      allow(knight).to receive(:targets).with([1, 1]).and_return([[2, 3], [0, 2]])
+
+      board.place_piece(rook, [0, 0])
+      board.place_piece(knight, [1, 1])
+
+      expect(board.get_all_targets(:white)).to match_array([[1, 0], [2, 0], [2, 3], [0, 2]])
+    end
+
+    it 'does not include targets from opponent pieces' do
+      white_rook = double('Rook', color: :white, sliding?: true)
+      allow(white_rook).to receive(:targets).with([0, 0]).and_return([[1, 0]])
+
+      black_knight = double('Knight', color: :black, sliding?: false)
+      allow(black_knight).to receive(:targets).with([7, 7]).and_return([[5, 6], [6, 5]])
+
+      board.place_piece(white_rook, [0, 0])
+      board.place_piece(black_knight, [7, 7])
+
+      expect(board.get_all_targets(:white)).to eq([[1, 0]])
+      expect(board.get_all_targets(:black)).to eq([[5, 6], [6, 5]])
+    end
+
+    it 'returns a flat array of coordinate pairs when combining multiple pieces' do
+      rook = double('Rook', color: :white, sliding?: true)
+      allow(rook).to receive(:targets).with([0, 0]).and_return([[1, 0], [2, 0]])
+
+      knight = double('Knight', color: :white, sliding?: false)
+      allow(knight).to receive(:targets).with([1, 1]).and_return([[2, 3], [0, 2]])
+
+      board.place_piece(rook, [0, 0])
+      board.place_piece(knight, [1, 1])
+
+      result = board.get_all_targets(:white)
+
+      # Flat array of coordinate pairs: [[1, 0], [2, 0], [2, 3], [0, 2]]
+      expect(result).to be_an(Array)
+      expect(result).to all(be_an(Array).and(have_attributes(size: 2)))
+      expect(result.flatten).to all(be_an(Integer))
+
+      # Explicitly confirm no nested arrays like [[[...]]]
+      expect(result).not_to include(an_instance_of(Array).and(satisfy { |a| a.any? { |x| x.is_a?(Array) } }))
+    end
+  end
+
+  describe '#in_check?' do
+    before do
+      board.clear_board
+    end
+
+    it 'returns true if the king is under attack' do
+      # Stub the king's position
+      allow(board).to receive(:find_king).with(:white).and_return([4, 0])
+      # Simulate that black is targeting that square
+      allow(board).to receive(:get_all_targets).with(:black).and_return([[4, 0], [3, 2]])
+
+      expect(board.in_check?(:white)).to be true
+    end
+
+    it 'returns false if the king is not under attack' do
+      allow(board).to receive(:find_king).with(:white).and_return([4, 0])
+      allow(board).to receive(:get_all_targets).with(:black).and_return([[3, 2], [5, 1]])
+
+      expect(board.in_check?(:white)).to be false
+    end
+
+    it 'checks correct opponent color' do
+      # Just a sanity check for black's king this time
+      allow(board).to receive(:find_king).with(:black).and_return([4, 7])
+      allow(board).to receive(:get_all_targets).with(:white).and_return([[4, 7]])
+
+      expect(board.in_check?(:black)).to be true
+    end
+  end
+
+  describe '#results_in_check?' do
+    let(:piece) { double('Piece', color: :white) }
+    let(:clone) { instance_double(Board) }
+
+    before do
+      board.clear_board
+      allow(board).to receive(:piece_at).with([1, 1]).and_return(piece)
+      allow(board).to receive(:deep_clone).and_return(clone)
+      allow(clone).to receive(:execute_move)
+    end
+
+    it 'returns true if move results in check' do
+      allow(clone).to receive(:in_check?).with(:white).and_return(true)
+
+      result = board.results_in_check?([1, 1], [2, 2])
+      expect(result).to be true
+    end
+
+    it 'returns false if move does not result in check' do
+      allow(clone).to receive(:in_check?).with(:white).and_return(false)
+
+      result = board.results_in_check?([1, 1], [2, 2])
+      expect(result).to be false
+    end
+
+    it 'uses the correct piece color when checking for check' do
+      expect(clone).to receive(:in_check?).with(:white).and_return(false)
+
+      board.results_in_check?([1, 1], [2, 2])
+    end
+
+    it 'executes the move on the cloned board' do
+      expect(clone).to receive(:execute_move).with([1, 1], [2, 2])
+      allow(clone).to receive(:in_check?).with(:white).and_return(false)
+
+      board.results_in_check?([1, 1], [2, 2])
+    end
+  end
+
 end
