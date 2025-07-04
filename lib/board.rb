@@ -35,22 +35,44 @@ class Board
     @state[coords[0]][coords[1]]
   end
 
-  def execute_move(from, to)
-    # get piece
-    piece = @state[from[0]][from[1]]
-
-    # If the piece is a pawn:
-    if piece.is_a?(Pawn)
-      # If the 'to' square equals the @en_pasasnt_target, an en passant capture is being made
-      # if move was 2 squares? set @en_passant_target to the passed over square
-      # else set @en_passant_target to nil
-    else
-
-    # move piece to target
-    @state[to[0]][to[1]] = piece
-
+  def execute_en_passant(from, to)
+    pawn = piece_at(from)
+    
+    # move pawn to new square
+    @state[to[0]][to[1]] = pawn
     # empty starting square
     @state[from[0]][from[1]] = nil
+    # remove enemy pawn (row 3 for black pieces, row 4 for white pieces)
+    direction = pawn.color == :white ? -1 : 1
+    captured_row = to[0] + direction
+    @state[captured_row][to[1]] = nil
+  end
+
+  def update_en_passant_target(pawn, from)
+    # if pawn comes from row 1, the en passant target will be on row 2 (black pieces), otherwise it will be on row 5 (white pieces)
+    direction = pawn.color == :white ? -1 : 1
+    intermediate_row = from[0] + direction
+    @en_passant_target = [intermediate_row, from[1]]
+  end
+  
+  def execute_move(from, to)
+    piece = piece_at(from)
+    
+    if piece.is_a?(Pawn) && @en_passant_target == to
+      execute_en_passant(from, to)
+    else
+      # move piece to new square
+      @state[to[0]][to[1]] = piece
+      # empty starting square
+      @state[from[0]][from[1]] = nil
+    end
+    
+    # Update en passant target 
+    if piece.is_a?(Pawn) && (from[0]-to[0]).abs == 2
+      update_en_passant_target(piece, from)
+    else
+      @en_passant_target = nil
+    end
   end
 
   def validate_selection(coords, player)
