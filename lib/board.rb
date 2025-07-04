@@ -14,6 +14,7 @@ class Board
 
   def initialize
     @state = Array.new(8) { Array.new(8) }
+    @en_passant_target = nil
     set_up_pieces
   end
 
@@ -38,6 +39,13 @@ class Board
     # get piece
     piece = @state[from[0]][from[1]]
 
+    # If the piece is a pawn:
+    if piece.is_a?(Pawn)
+      # If the 'to' square equals the @en_pasasnt_target, an en passant capture is being made
+      # if move was 2 squares? set @en_passant_target to the passed over square
+      # else set @en_passant_target to nil
+    else
+
     # move piece to target
     @state[to[0]][to[1]] = piece
 
@@ -51,16 +59,41 @@ class Board
     piece.nil? ? false : piece.color == player.color
   end
 
+  def validate_pawn_move(from, to)
+    moving_piece = piece_at(from)
+    target_piece = piece_at(to)
+
+    # Forward move
+    if from[1] == to[1] 
+      return false unless target_piece.nil? && clear_path?(from, to)
+    else
+      # Diagonal move
+      if @en_passant_target == to
+        # ok for now, but cant return true before the results_in_check? validation
+      else
+        return false if target_piece.nil? || target_piece.color == moving_piece.color
+      end
+    end
+    # For all moves: not valid if resulting in check
+    return false if results_in_check?(from, to)
+
+    true
+  end
+
   def validate_destination(from, to)
     piece = piece_at(from)
-    
+
     return false if piece.nil?
+    return validate_pawn_move(from, to) if piece.is_a?(Pawn)
+    
     return false unless piece.targets(from).include?(to)
     return false if friendly_fire?(from, to)
-    return false if piece.sliding? && !clear_path?
-    return false if results_in_check?(from, to)
-    # return false if invalid en passant capture
+    return false if piece.sliding? && !clear_path?(from, to)
     # return false if illegal castling
+    
+    return false if results_in_check?(from, to)
+
+    true
   end
 
   def results_in_check?(from, to)
