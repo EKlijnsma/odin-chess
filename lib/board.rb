@@ -15,6 +15,12 @@ class Board
   def initialize
     @state = Array.new(8) { Array.new(8) }
     @en_passant_target = nil
+    @castling_rights = {
+      white_kingside: true
+      white_queenside: true
+      black_kingside: true
+      black_queenside: true
+    }
     set_up_pieces
   end
 
