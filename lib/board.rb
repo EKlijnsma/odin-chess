@@ -43,7 +43,7 @@ class Board
 
   def execute_en_passant(from, to)
     pawn = piece_at(from)
-    
+
     # move pawn to new square
     @state[to[0]][to[1]] = pawn
     # empty starting square
@@ -60,25 +60,72 @@ class Board
     intermediate_row = from[0] + direction
     @en_passant_target = [intermediate_row, from[1]]
   end
-  
+
+  def execute_castling(from, to)
+    row = from[0]
+
+    if to[1] == 6 # kingside
+      # Move king
+      @state[row][6] = @state[row][4]
+      @state[row][4] = nil
+      # Move rook
+      @state[row][5] = @state[row][7]
+      @state[row][7] = nil
+
+    elsif to[1] == 2 # queenside
+      # Move king
+      @state[row][2] = @state[row][4]
+      @state[row][4] = nil
+      # Move rook
+      @state[row][3] = @state[row][0]
+      @state[row][0] = nil
+    end
+  end
+
   def execute_move(from, to)
     piece = piece_at(from)
-    
-    if piece.is_a?(Pawn) && @en_passant_target == to
+
+    # Handle castling moves
+    if piece.is_a?(King) && piece.castles?(from, to)
+      execute_castling(from, to)
+
+    # Handle en passant moves
+    elsif piece.is_a?(Pawn) && @en_passant_target == to
       execute_en_passant(from, to)
+
+    # Handle standard moves
     else
-      # move piece to new square
       @state[to[0]][to[1]] = piece
-      # empty starting square
       @state[from[0]][from[1]] = nil
     end
-    
-    # Update en passant target 
-    if piece.is_a?(Pawn) && (from[0]-to[0]).abs == 2
+
+    # Update en passant target
+    if piece.is_a?(Pawn) && (from[0] - to[0]).abs == 2
       update_en_passant_target(piece, from)
     else
       @en_passant_target = nil
     end
+
+    # Revoke castling rights
+    update_castling_rights(from) if piece.is_a?(King) || piece.is_a?(Rook)
+  end
+
+  def update_castling_rights(from)
+    # Black
+    @castling_rights[:black_queenside] = false if from == [0, 0]
+    @castling_rights[:black_kingside] = false if from == [0, 7]
+    if from == [0, 4]
+      @castling_rights[:black_queenside] = false
+      @castling_rights[:black_kingside] = false
+    end
+
+    # White
+    @castling_rights[:white_queenside] = false if from == [7, 0]
+    @castling_rights[:white_kingside] = false if from == [7, 7]
+    return unless from == [7, 4]
+
+    @castling_rights[:white_queenside] = false
+    @castling_rights[:white_kingside] = false
   end
 
   def validate_selection(coords, player)
@@ -92,15 +139,13 @@ class Board
     target_piece = piece_at(to)
 
     # Forward move
-    if from[1] == to[1] 
+    if from[1] == to[1]
       return false unless target_piece.nil? && clear_path?(from, to)
-    else
-      # Diagonal move
-      if @en_passant_target == to
-        # ok for now, but cant return true before the results_in_check? validation
-      else
-        return false if target_piece.nil? || target_piece.color == moving_piece.color
-      end
+    elsif @en_passant_target == to
+    # Diagonal move
+    # ok for now, but cant return true before the results_in_check? validation
+    elsif target_piece.nil? || target_piece.color == moving_piece.color
+      return false
     end
     # For all moves: not valid if resulting in check
     return false if results_in_check?(from, to)
@@ -110,15 +155,15 @@ class Board
 
   def validate_castle(from, to)
     castle_data = {
-      [7, 2] => { rook_pos: [7, 0], skipped_square: [7, 3], rights: :white_queenside},
-      [7, 6] => { rook_pos: [7, 7], skipped_square: [7, 5], rights: :white_kingside},
-      [0, 2] => { rook_pos: [0, 0], skipped_square: [0, 3], rights: :black_queenside},
-      [0, 6] => { rook_pos: [0, 7], skipped_square: [0, 5], rights: :black_kingside}
+      [7, 2] => { rook_pos: [7, 0], skipped_square: [7, 3], rights: :white_queenside },
+      [7, 6] => { rook_pos: [7, 7], skipped_square: [7, 5], rights: :white_kingside },
+      [0, 2] => { rook_pos: [0, 0], skipped_square: [0, 3], rights: :black_queenside },
+      [0, 6] => { rook_pos: [0, 7], skipped_square: [0, 5], rights: :black_kingside }
     }
 
     data = castle_data[to]
     return false unless data
-    
+
     return false unless @castling_rights[data[:rights]] # If no longer has castling rights
     return false if in_check?(piece_at(from).color) # If currently in check
     return false unless clear_path?(from, data[:rook_pos]) # If pieces are still between king and rook
@@ -135,11 +180,11 @@ class Board
     return false if piece.nil?
     return validate_pawn_move(from, to) if piece.is_a?(Pawn)
     return validate_castle(from, to) if piece.is_a?(King) && piece.castles?(from, to)
-    
+
     return false unless piece.targets(from).include?(to)
     return false if friendly_fire?(from, to)
     return false if piece.sliding? && !clear_path?(from, to)
-    
+
     return false if results_in_check?(from, to)
 
     true
