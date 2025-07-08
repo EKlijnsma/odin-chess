@@ -13,4 +13,12 @@ class King < Piece
       [1, 1], [1, 0], [1, -1], [0, -1]
     ]
   end
+
+  def castles?(from, to)
+    if color == :white
+      from == [7, 4] && [[7, 2], [7, 6]].include?(to)
+    else
+      from == [0, 4] && [[0, 2], [0, 6]].include?(to)
+    end
+  end
 end

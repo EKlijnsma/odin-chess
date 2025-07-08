@@ -108,16 +108,37 @@ class Board
     true
   end
 
+  def validate_castle(from, to)
+    castle_data = {
+      [7, 2] => { rook_pos: [7, 0], skipped_square: [7, 3], rights: :white_queenside}
+      [7, 6] => { rook_pos: [7, 7], skipped_square: [7, 5], rights: :white_kingside}
+      [0, 2] => { rook_pos: [0, 0], skipped_square: [0, 3], rights: :black_queenside}
+      [0, 6] => { rook_pos: [0, 7], skipped_square: [0, 5], rights: :black_kingside}
+    }
+
+    data = castle_data[to]
+    return false unless data
+    
+    return false if @castling_rights[data[:rights]] # If no longer has castling rights
+    return false if in_check?(piece_at(from).color) # If currently in check
+    return false unless clear_path?(from, data[:rook_pos]) # If pieces are still between king and rook
+    return false if results_in_check?(from, data[:skipped_square]) # If passing through check
+    return false if results_in_check?(from, to) # If ending up in check
+
+    # If all the above passes, its a valid castling move
+    true
+  end
+
   def validate_destination(from, to)
     piece = piece_at(from)
 
     return false if piece.nil?
     return validate_pawn_move(from, to) if piece.is_a?(Pawn)
+    return validate_castle(from, to) if piece.is_a?(King) && piece.castles?(from, to)
     
     return false unless piece.targets(from).include?(to)
     return false if friendly_fire?(from, to)
     return false if piece.sliding? && !clear_path?(from, to)
-    # return false if illegal castling
     
     return false if results_in_check?(from, to)
 
