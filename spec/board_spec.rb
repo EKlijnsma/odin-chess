@@ -360,4 +360,84 @@ describe Board do
     end
   end
 
+describe '#validate_castle' do
+  let(:board) { Board.new }
+  
+  before do
+    # Clear squares between king and rook for castling (both sides)
+    [[7,1],[7,2],[7,3],[7,5],[7,6],[0,1],[0,2],[0,3],[0,5],[0,6]].each do |row, col|
+      board.state[row][col] = nil
+    end
+    # Enable all castling rights
+    board.instance_variable_set(:@castling_rights, {
+      white_kingside: true,
+      white_queenside: true,
+      black_kingside: true,
+      black_queenside: true
+    })
+  end
+
+  context 'when castling is allowed' do
+    it 'returns true for white kingside castling' do
+      expect(board.validate_castle([7,4],[7,6])).to be true
+    end
+
+    it 'returns true for white queenside castling' do
+      expect(board.validate_castle([7,4],[7,2])).to be true
+    end
+
+    it 'returns true for black kingside castling' do
+      expect(board.validate_castle([0,4],[0,6])).to be true
+    end
+
+    it 'returns true for black queenside castling' do
+      expect(board.validate_castle([0,4],[0,2])).to be true
+    end
+  end
+
+  context 'when castling is disallowed' do
+    it 'returns false if castling rights are lost' do
+      board.instance_variable_set(:@castling_rights, {
+        white_kingside: false,
+        white_queenside: false,
+        black_kingside: false,
+        black_queenside: false
+      })
+      expect(board.validate_castle([7,4],[7,6])).to be false
+      expect(board.validate_castle([7,4],[7,2])).to be false
+      expect(board.validate_castle([0,4],[0,6])).to be false
+      expect(board.validate_castle([0,4],[0,2])).to be false
+    end
+
+    it 'returns false if king is currently in check' do
+      allow(board).to receive(:in_check?).and_return(true)
+      expect(board.validate_castle([7,4],[7,6])).to be false
+    end
+
+    it 'returns false if path between king and rook is blocked' do
+      # Put a piece back in a blocking position
+      board.state[7][5] = Knight.new(:white) # Replace with your actual piece class
+      expect(board.validate_castle([7,4],[7,6])).to be false
+    end
+
+    it 'returns false if king passes through a square attacked by opponent' do
+      # Stub results_in_check? to simulate passing through check
+      allow(board).to receive(:results_in_check?).with([7,4],[7,5]).and_return(true)
+      expect(board.validate_castle([7,4],[7,6])).to be false
+    end
+
+    it 'returns false if king ends on a square attacked by opponent' do
+      # Stub results_in_check? to simulate ending in check
+      allow(board).to receive(:results_in_check?).with([7,4],[7,5]).and_return(false)
+      allow(board).to receive(:results_in_check?).with([7,4],[7,6]).and_return(true)
+      expect(board.validate_castle([7,4],[7,6])).to be false
+    end
+
+    it 'returns false for invalid castling target squares' do
+      expect(board.validate_castle([7,4],[7,4])).to be false
+      expect(board.validate_castle([7,4],[7,7])).to be false
+      expect(board.validate_castle([0,4],[1,4])).to be false
+    end
+  end
+end
 end

@@ -16,9 +16,9 @@ class Board
     @state = Array.new(8) { Array.new(8) }
     @en_passant_target = nil
     @castling_rights = {
-      white_kingside: true
-      white_queenside: true
-      black_kingside: true
+      white_kingside: true,
+      white_queenside: true,
+      black_kingside: true,
       black_queenside: true
     }
     set_up_pieces
@@ -110,16 +110,16 @@ class Board
 
   def validate_castle(from, to)
     castle_data = {
-      [7, 2] => { rook_pos: [7, 0], skipped_square: [7, 3], rights: :white_queenside}
-      [7, 6] => { rook_pos: [7, 7], skipped_square: [7, 5], rights: :white_kingside}
-      [0, 2] => { rook_pos: [0, 0], skipped_square: [0, 3], rights: :black_queenside}
+      [7, 2] => { rook_pos: [7, 0], skipped_square: [7, 3], rights: :white_queenside},
+      [7, 6] => { rook_pos: [7, 7], skipped_square: [7, 5], rights: :white_kingside},
+      [0, 2] => { rook_pos: [0, 0], skipped_square: [0, 3], rights: :black_queenside},
       [0, 6] => { rook_pos: [0, 7], skipped_square: [0, 5], rights: :black_kingside}
     }
 
     data = castle_data[to]
     return false unless data
     
-    return false if @castling_rights[data[:rights]] # If no longer has castling rights
+    return false unless @castling_rights[data[:rights]] # If no longer has castling rights
     return false if in_check?(piece_at(from).color) # If currently in check
     return false unless clear_path?(from, data[:rook_pos]) # If pieces are still between king and rook
     return false if results_in_check?(from, data[:skipped_square]) # If passing through check
