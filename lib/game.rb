@@ -32,7 +32,7 @@ class Game
   end
 
   def announce_result
-    # TODO -> winner if checkmate, else draw
+    # TODO: -> winner if checkmate, else draw
   end
 
   def switch_players

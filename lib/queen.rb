@@ -21,7 +21,7 @@ class Queen < Piece
     end
     moves
   end
-  
+
   def sliding?
     true
   end
