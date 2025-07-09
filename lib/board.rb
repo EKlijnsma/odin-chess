@@ -111,7 +111,8 @@ class Board
     elsif piece.is_a?(Pawn) && @en_passant_target == to
       execute_en_passant(from, to)
 
-    elsif piece.is_a?(Pawn) && [0, 7].include?(to[0])
+    # Handle pawn promotion
+    elsif piece.is_a?(Pawn) && [7, 0].include?(to[0])
       execute_promotion(from, to)
 
     # Handle standard moves
