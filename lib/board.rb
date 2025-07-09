@@ -82,6 +82,24 @@ class Board
     end
   end
 
+  def execute_promotion(from, to)
+    color = piece_at(from).color
+
+    input = nil
+    loop do
+      puts 'Promote to Queen, Rook, Knight or Bishop? Enter Q, R, K or B'
+      input = gets.chomp.downcase
+      break if %w[q r k b].include?(input)
+
+      puts 'Invalid input'
+    end
+
+    pieces = { 'q' => Queen, 'r' => Rook, 'k' => Knight, 'b' => Bishop }
+
+    @state[to[0]][to[1]] = pieces[input].new(color)
+    @state[from[0]][from[1]] = nil
+  end
+
   def execute_move(from, to)
     piece = piece_at(from)
 
@@ -92,6 +110,9 @@ class Board
     # Handle en passant moves
     elsif piece.is_a?(Pawn) && @en_passant_target == to
       execute_en_passant(from, to)
+
+    elsif piece.is_a?(Pawn) && [0, 7].include?(to[0])
+      execute_promotion(from, to)
 
     # Handle standard moves
     else
