@@ -440,4 +440,48 @@ describe Board do
       end
     end
   end
+
+  describe '#pieces' do
+    context 'when board is empty' do
+      it 'returns an empty array for any color' do
+        board.instance_variable_set(:@state, Array.new(8) { Array.new(8, nil) })
+        expect(board.pieces(:white)).to eq([])
+        expect(board.pieces(:black)).to eq([])
+      end
+    end
+
+    context 'when board has pieces of one color' do
+      before do
+        empty_board = Array.new(8) { Array.new(8, nil) }
+        empty_board[0][0] = King.new(:white)
+        empty_board[1][2] = Bishop.new(:white)
+        empty_board[7][7] = Knight.new(:black) # other color piece
+        board.instance_variable_set(:@state, empty_board)
+      end
+
+      it 'returns only the white pieces when given :white' do
+        white_pieces = board.pieces(:white)
+
+        expect(white_pieces.length).to eq(2)
+        expect(white_pieces).to all(include(:piece, :row, :col))
+
+        piece_classes = white_pieces.map { |entry| entry[:piece].class }
+        expect(piece_classes).to contain_exactly(King, Bishop)
+
+        expect(white_pieces).to match_array([
+          { piece: kind_of(King), row: 0, col: 0 },
+          { piece: kind_of(Bishop), row: 1, col: 2 }
+        ])
+      end
+
+      it 'returns only the black pieces when given :black' do
+        black_pieces = board.pieces(:black)
+
+        expect(black_pieces.length).to eq(1)
+        expect(black_pieces.first[:piece]).to be_a(Knight)
+        expect(black_pieces.first[:row]).to eq(7)
+        expect(black_pieces.first[:col]).to eq(7)
+      end
+    end
+  end
 end
