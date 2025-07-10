@@ -2,6 +2,7 @@
 
 require_relative 'player'
 require_relative 'board'
+require_relative 'display'
 
 class Game
   attr_accessor :player1, :player2, :board, :current_player
@@ -24,27 +25,21 @@ class Game
     @position_history << snapshot
   end
 
-    
   def play
     loop do
+      @board.render
+      Display.declare_check(@current_player) if @board.in_check?(@current_player.color)
       take_turn(@current_player)
       break if game_over?
 
       switch_players
     end
-    announce_result
   end
 
   def take_turn(player)
-    @board.render
-    puts "#{player}'s turn"
     move = get_move(player)
     @board.execute_move(move[0], move[1])
     @board.render
-  end
-
-  def announce_result
-    # TODO: -> winner if checkmate, else draw
   end
 
   def switch_players
@@ -57,8 +52,21 @@ class Game
 
   def game_over?
     next_player = (@current_player == @player1 ? @player2 : @player1)
-
-    checkmate?(next_player) || stalemate?(next_player) || threefold_repetition? || insufficient_material?
+    if checkmate?(next_player)
+      Display.announce_winner(next_player)
+      true
+    elsif stalemate?(next_player)
+      Display.announce_draw('Stalemate')
+      true
+    elsif threefold_repetition?
+      Display.announce_draw('Repeated positions')
+      true
+    elsif insufficient_material?
+      Display.announce_draw('Insufficient material')
+      true
+    else
+      false
+    end
   end
 
   def stalemate?(player)
@@ -87,7 +95,7 @@ class Game
     # King vs King + Bishop or vs King + Knight is a draw
     bishops = all_pieces.filter { |p| p[:piece].is_a?(Bishop) }
     knights = all_pieces.filter { |p| p[:piece].is_a?(Knight) }
-    
+
     return true if all_pieces.size == 3 && (bishops + knights).size == 1
 
     # The only other case for a draw if is Kings vs same squared Bishops (light or dark squares)
@@ -99,7 +107,7 @@ class Game
   def same_colored_bishops?(white, black)
     white_bishops = white.filter { |p| p[:piece].is_a?(Bishop) }
     black_bishops = black.filter { |p| p[:piece].is_a?(Bishop) }
-  
+
     if white_bishops.size == 1 && black_bishops.size == 1
       same_color = (white_bishops[0][:row] + white_bishops[0][:col]) % 2 ==
                    (black_bishops[0][:row] + black_bishops[0][:col]) % 2
@@ -128,7 +136,7 @@ class Game
       coords = notation_to_coords(input)
       return coords if @board.validate_selection(coords, player)
 
-      puts 'Invalid piece selection, try again.'
+      Display.invalid_input('Invalid piece selection, try again.')
     end
   end
 
@@ -140,7 +148,7 @@ class Game
       coords = notation_to_coords(input)
       return coords if @board.validate_destination(piece_coords, coords)
 
-      puts 'Invalid destination, try again or type "cancel" to select a different piece.'
+      Display.invalid_input('Invalid destination, try again or type "cancel" to select a different piece.')
     end
   end
 

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative 'display'
+
 class Player
   attr_accessor :name, :color
 
@@ -11,23 +13,26 @@ class Player
   def select_piece
     input = nil
     loop do
-      puts 'Select one of your pieces by entering its square (e.g. "e2"):'
+      Display.prompt_move(self)
+      Display.enter_square('select')
       input = gets.chomp.downcase
       return input if chess_square?(input)
 
-      puts 'Invalid input, please enter a square like "e2".'
+      Display.invalid_input('please enter a square like "e2".')
     end
+    input
   end
 
   def select_destination
     input = nil
     loop do
-      puts 'Select a destination square (e.g. "e4"), or type "cancel" to select a different piece:'
+      Display.enter_square('destination')
       input = gets.chomp.downcase
       return input if chess_square?(input) || input == 'cancel'
 
-      puts 'Invalid input, please enter a valid square or "cancel".'
+      Display.invalid_input('please enter a valid square or "cancel".')
     end
+    input
   end
 
   def chess_square?(string)
