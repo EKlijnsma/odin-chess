@@ -11,8 +11,20 @@ class Game
     @player1 = player1
     @player2 = player2
     @current_player = player1
+    @position_history = []
   end
 
+  def update_position_history
+    snapshot = {
+      board: @board.state.flatten,
+      turn: @current_player,
+      castling: @board.castling_rights,
+      en_passant: @board.en_passant_target
+    }
+    @position_history << snapshot
+  end
+
+    
   def play
     loop do
       take_turn(@current_player)
@@ -58,7 +70,9 @@ class Game
   end
 
   def threefold_repetition?
-    # TODO
+    # Take the latest position snapshot and see if it has occured 3 times or more
+    current = @position_history[-1]
+    @position_history.count(current) >= 3
   end
 
   def insufficient_material?
