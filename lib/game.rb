@@ -62,7 +62,36 @@ class Game
   end
 
   def insufficient_material?
-    # TODO
+    # Fetch all white and black pieces
+    white_pieces = @board.pieces(:white)
+    black_pieces = @board.pieces(:black)
+    all_pieces = white_pieces + black_pieces
+
+    # King vs King is a draw
+    return true if all_pieces.size == 2
+
+    # King vs King + Bishop or vs King + Knight is a draw
+    bishops = all_pieces.filter { |p| p[:piece].is_a?(Bishop) }
+    knights = all_pieces.filter { |p| p[:piece].is_a?(Knight) }
+    
+    return true if all_pieces.size == 3 && (bishops + knights).size == 1
+
+    # The only other case for a draw if is Kings vs same squared Bishops (light or dark squares)
+    return true if all_pieces.size == 4 && same_colored_bishops(white_pieces, black_pieces)
+
+    false
+  end
+
+  def same_colored_bishops(white, black)
+    white_bishops = white.filter { |p| p[:piece].is_a?(Bishop) }
+    black_bishops = black.filter { |p| p[:piece].is_a?(Bishop) }
+  
+    if white_bishops.size == 1 && black_bishops.size == 1
+      same_color = (white_bishops[0][:row] + white_bishops[0][:col]) % 2 ==
+                   (black_bishops[0][:row] + black_bishops[0][:col]) % 2
+      return true if same_color
+    end
+    false
   end
 
   def has_legal_moves?(player)

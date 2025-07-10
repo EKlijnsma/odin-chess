@@ -254,6 +254,17 @@ class Board
     all_moves
   end
 
+  def pieces(color)
+    pieces = []
+    @state.each_with_index do |row, i|
+      row.each_with_index do |piece, j|
+        next if piece.nil? || piece.color != color
+        pieces << {piece: piece, row: i, col: j}
+      end
+    end
+    pieces
+  end
+
   def find_king(color)
     @state.each_with_index do |row, i|
       row.each_with_index do |piece, j|
