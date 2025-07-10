@@ -91,12 +91,12 @@ class Game
     return true if all_pieces.size == 3 && (bishops + knights).size == 1
 
     # The only other case for a draw if is Kings vs same squared Bishops (light or dark squares)
-    return true if all_pieces.size == 4 && same_colored_bishops(white_pieces, black_pieces)
+    return true if all_pieces.size == 4 && same_colored_bishops?(white_pieces, black_pieces)
 
     false
   end
 
-  def same_colored_bishops(white, black)
+  def same_colored_bishops?(white, black)
     white_bishops = white.filter { |p| p[:piece].is_a?(Bishop) }
     black_bishops = black.filter { |p| p[:piece].is_a?(Bishop) }
   
