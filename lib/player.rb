@@ -13,6 +13,18 @@ class Player
     @color = color
   end
 
+  def get_move
+    from = select_piece
+    to = select_destination
+    [from, to]
+  end
+
+  def to_s
+    @name
+  end
+
+  private
+
   def select_piece
     input = nil
     loop do
@@ -37,12 +49,6 @@ class Player
     end
     input
   end
-
-  def to_s
-    @name
-  end
-
-  private
 
   def chess_square?(string)
     # returning a boolean indicating if the string represents a valid chess square

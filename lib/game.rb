@@ -3,6 +3,8 @@
 require_relative 'player'
 require_relative 'board'
 require_relative 'display'
+require_relative 'move_validator'
+require_relative 'move_generator'
 
 class Game
   attr_accessor :player1, :player2, :board, :current_player
@@ -28,7 +30,7 @@ class Game
   def play
     loop do
       @board.render
-      Display.declare_check(@current_player) if @board.in_check?(@current_player.color)
+      Display.declare_check(@current_player) if MoveValidator.new(@board).in_check?(@current_player.color)
       take_turn(@current_player)
       break if game_over?
 
@@ -36,24 +38,36 @@ class Game
     end
   end
 
+  private
+
   def take_turn(player)
-    move = get_move(player)
-    @board.execute_move(move[0], move[1])
-    @board.render
+    loop do
+      input = player.get_move
+      from = notation_to_coords(input[0])
+      to = notation_to_coords(input[1])
+      move = [from, to]
+      puts "move = #{move}"
+      next unless MoveValidator.new(@board).valid_move?(move[0], move[1], player.color)
+
+      # Execute
+      @board.execute_move(move[0], move[1])
+      @board.render
+      break
+    end
   end
 
   def switch_players
-    @current_player = if @current_player == player1
-                        player2
+    @current_player = if @current_player == @player1
+                        @player2
                       else
-                        player1
+                        @player1
                       end
   end
 
   def game_over?
     next_player = (@current_player == @player1 ? @player2 : @player1)
     if checkmate?(next_player)
-      Display.announce_winner(next_player)
+      Display.announce_winner(@current_player)
       true
     elsif stalemate?(next_player)
       Display.announce_draw('Stalemate')
@@ -70,11 +84,13 @@ class Game
   end
 
   def stalemate?(player)
-    !@board.in_check?(player.color) && !has_legal_moves?(player)
+    mv = MoveValidator.new(@board)
+    !mv.in_check?(player.color) && !mv.has_legal_moves?(player.color)
   end
 
   def checkmate?(player)
-    @board.in_check?(player.color) && !has_legal_moves?(player)
+    mv = MoveValidator.new(@board)
+    mv.in_check?(player.color) && !mv.has_legal_moves?(player.color)
   end
 
   def threefold_repetition?
@@ -116,41 +132,41 @@ class Game
     false
   end
 
-  def has_legal_moves?(player)
-    moves = @board.get_all_moves(player.color)
-    moves.each do |move|
-      return true if @board.validate_destination(move[0], move[1])
-    end
-    false
-  end
+  # def has_legal_moves?(player)
+  #   moves = @board.get_all_moves(player.color)
+  #   moves.each do |move|
+  #     return true if @board.validate_destination(move[0], move[1])
+  #   end
+  #   false
+  # end
 
-  def get_move(player)
-    piece_coords = select_valid_piece(player)
-    destination_coords = select_valid_destination(player, piece_coords)
-    [piece_coords, destination_coords]
-  end
+  # def get_move(player)
+  #   piece_coords = select_valid_piece(player)
+  #   destination_coords = select_valid_destination(player, piece_coords)
+  #   [piece_coords, destination_coords]
+  # end
 
-  def select_valid_piece(player)
-    loop do
-      input = player.select_piece
-      coords = notation_to_coords(input)
-      return coords if @board.validate_selection(coords, player)
+  # def select_valid_piece(player)
+  #   loop do
+  #     input = player.select_piece
+  #     coords = notation_to_coords(input)
+  #     return coords if @board.validate_selection(coords, player)
 
-      Display.invalid_input('Invalid piece selection, try again.')
-    end
-  end
+  #     Display.invalid_input('Invalid piece selection, try again.')
+  #   end
+  # end
 
-  def select_valid_destination(player, piece_coords)
-    loop do
-      input = player.select_destination
-      return get_move(player) if input == 'cancel'
+  # def select_valid_destination(player, piece_coords)
+  #   loop do
+  #     input = player.select_destination
+  #     return get_move(player) if input == 'cancel'
 
-      coords = notation_to_coords(input)
-      return coords if @board.validate_destination(piece_coords, coords)
+  #     coords = notation_to_coords(input)
+  #     return coords if @board.validate_destination(piece_coords, coords)
 
-      Display.invalid_input('Invalid destination, try again or type "cancel" to select a different piece.')
-    end
-  end
+  #     Display.invalid_input('Invalid destination, try again or type "cancel" to select a different piece.')
+  #   end
+  # end
 
   def notation_to_coords(notation)
     file = notation[0]
