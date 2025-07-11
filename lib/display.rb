@@ -1,3 +1,8 @@
+# frozen_string_literal: true
+
+# The Display module handles all output messages shown to the player.
+# It provides methods for announcing game results, prompting for input,
+# and notifying players of game state changes (e.g., check or invalid input).
 module Display
   def self.announce_winner(winner)
     puts "\nCheckmate! #{winner.name} wins the game!"
@@ -17,8 +22,6 @@ module Display
       puts 'Select one of your pieces by entering its square (e.g. "e2"):'
     when 'destination'
       puts 'Select a destination square (e.g. "e4"), or type "cancel" to select a different piece:'
-    else
-      # pass
     end
   end
 
