@@ -16,6 +16,8 @@ class Player
   def get_move
     from = select_piece
     to = select_destination
+    return get_move if to == 'cancel'
+
     [from, to]
   end
 

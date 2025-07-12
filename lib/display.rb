@@ -16,6 +16,10 @@ module Display
     puts "#{player}'s turn: "
   end
 
+  def self.promotion
+    puts 'Promote to Queen, Rook, Knight or Bishop? Enter Q, R, K or B'
+  end
+
   def self.enter_square(reason)
     case reason
     when 'select'

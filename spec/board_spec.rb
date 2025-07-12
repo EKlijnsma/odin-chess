@@ -469,9 +469,9 @@ describe Board do
         expect(piece_classes).to contain_exactly(King, Bishop)
 
         expect(white_pieces).to match_array([
-          { piece: kind_of(King), row: 0, col: 0 },
-          { piece: kind_of(Bishop), row: 1, col: 2 }
-        ])
+                                              { piece: kind_of(King), row: 0, col: 0 },
+                                              { piece: kind_of(Bishop), row: 1, col: 2 }
+                                            ])
       end
 
       it 'returns only the black pieces when given :black' do

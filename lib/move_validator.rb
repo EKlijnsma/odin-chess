@@ -2,6 +2,7 @@
 
 require_relative 'display'
 require_relative 'move_generator'
+require_relative 'move_executor'
 
 class MoveValidator
   attr_accessor :board
@@ -14,7 +15,7 @@ class MoveValidator
     if !valid_selection?(from, color)
       Display.invalid_input("You don't have a piece to move in that position")
       return false
-    elsif !valid_destination?(from, to, color)
+    elsif !valid_destination?(from, to)
       Display.invalid_input("You can't move that piece to that position")
       return false
     end
@@ -44,7 +45,7 @@ class MoveValidator
   def has_legal_moves?(color)
     moves = MoveGenerator.new(@board).all_moves(color)
     moves.each do |move|
-      return true if valid_destination?(move[0], move[1], color)
+      return true if valid_destination?(move[0], move[1])
     end
     false
   end
@@ -61,7 +62,7 @@ class MoveValidator
     end
   end
 
-  def valid_destination?(from, to, color)
+  def valid_destination?(from, to)
     piece = @board.piece_at(from)
 
     return valid_pawn_move?(piece, from, to) if piece.is_a?(Pawn)
@@ -126,7 +127,7 @@ class MoveValidator
     # Execute the move on a cloned board and evaluate if the king is in check
     color = @board.piece_at(from).color
     test_board = @board.deep_clone
-    test_board.execute_move(from, to)
+    MoveExecutor.new(test_board).execute_move(from, to)
     in_check?(color, test_board)
   end
 end

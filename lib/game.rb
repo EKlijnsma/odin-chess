@@ -5,6 +5,7 @@ require_relative 'board'
 require_relative 'display'
 require_relative 'move_validator'
 require_relative 'move_generator'
+require_relative 'move_executor'
 
 class Game
   attr_accessor :player1, :player2, :board, :current_player
@@ -46,11 +47,11 @@ class Game
       from = notation_to_coords(input[0])
       to = notation_to_coords(input[1])
       move = [from, to]
-      puts "move = #{move}"
+
       next unless MoveValidator.new(@board).valid_move?(move[0], move[1], player.color)
 
       # Execute
-      @board.execute_move(move[0], move[1])
+      MoveExecutor.new(@board).execute_move(move[0], move[1])
       @board.render
       break
     end

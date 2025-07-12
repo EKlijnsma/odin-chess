@@ -175,12 +175,11 @@ describe Game do
       allow(white_bishop).to receive(:is_a?).with(Bishop).and_return(true)
       allow(black_bishop).to receive(:is_a?).with(Bishop).and_return(true)
     end
-    
 
     it 'returns true for same-colored bishops' do
       expect(game.same_colored_bishops?(black, white)).to be true
     end
-    
+
     it 'returns false for opposite-colored bishops' do
       expect(game.same_colored_bishops?(black2, white)).to be false
     end
@@ -189,21 +188,21 @@ describe Game do
   describe '#threefold_repetition?' do
     context 'when given a simple array' do
       it 'returns true when 3 repeated items' do
-        game.instance_variable_set(:@position_history, [1,2,3,2,5,2])
+        game.instance_variable_set(:@position_history, [1, 2, 3, 2, 5, 2])
         expect(game.threefold_repetition?).to be true
       end
-      
+
       it 'returns false when 2 repeated items' do
-        game.instance_variable_set(:@position_history, [1,2,3,4,5,2])
+        game.instance_variable_set(:@position_history, [1, 2, 3, 4, 5, 2])
         expect(game.threefold_repetition?).to be false
       end
-      
+
       it 'returns false when empty' do
         game.instance_variable_set(:@position_history, [])
         expect(game.threefold_repetition?).to be false
       end
     end
-    
+
     context 'when given an array of position hashes' do
       let(:pos1) do
         {
@@ -218,7 +217,7 @@ describe Game do
           board: Array.new(64, nil),
           turn: player2,
           castling: { white: %i[k], black: %i[k q] },
-          en_passant: [1,2]
+          en_passant: [1, 2]
         }
       end
       it 'returns true when 3 repeated items' do

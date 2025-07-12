@@ -41,18 +41,18 @@ class Board
     @state[coords[0]][coords[1]]
   end
 
-  def execute_en_passant(from, to)
-    pawn = piece_at(from)
+  # def execute_en_passant(from, to)
+  #   pawn = piece_at(from)
 
-    # move pawn to new square
-    @state[to[0]][to[1]] = pawn
-    # empty starting square
-    @state[from[0]][from[1]] = nil
-    # remove enemy pawn (row 3 for black pieces, row 4 for white pieces)
-    direction = pawn.color == :white ? -1 : 1
-    captured_row = to[0] - direction
-    @state[captured_row][to[1]] = nil
-  end
+  #   # move pawn to new square
+  #   @state[to[0]][to[1]] = pawn
+  #   # empty starting square
+  #   @state[from[0]][from[1]] = nil
+  #   # remove enemy pawn (row 3 for black pieces, row 4 for white pieces)
+  #   direction = pawn.color == :white ? -1 : 1
+  #   captured_row = to[0] - direction
+  #   @state[captured_row][to[1]] = nil
+  # end
 
   def update_en_passant_target(pawn, from)
     # if pawn comes from row 1, the en passant target will be on row 2 (black pieces), otherwise it will be on row 5 (white pieces)
@@ -61,76 +61,76 @@ class Board
     @en_passant_target = [intermediate_row, from[1]]
   end
 
-  def execute_castling(from, to)
-    row = from[0]
+  # def execute_castling(from, to)
+  #   row = from[0]
 
-    if to[1] == 6 # kingside
-      # Move king
-      @state[row][6] = @state[row][4]
-      @state[row][4] = nil
-      # Move rook
-      @state[row][5] = @state[row][7]
-      @state[row][7] = nil
+  #   if to[1] == 6 # kingside
+  #     # Move king
+  #     @state[row][6] = @state[row][4]
+  #     @state[row][4] = nil
+  #     # Move rook
+  #     @state[row][5] = @state[row][7]
+  #     @state[row][7] = nil
 
-    elsif to[1] == 2 # queenside
-      # Move king
-      @state[row][2] = @state[row][4]
-      @state[row][4] = nil
-      # Move rook
-      @state[row][3] = @state[row][0]
-      @state[row][0] = nil
-    end
-  end
+  #   elsif to[1] == 2 # queenside
+  #     # Move king
+  #     @state[row][2] = @state[row][4]
+  #     @state[row][4] = nil
+  #     # Move rook
+  #     @state[row][3] = @state[row][0]
+  #     @state[row][0] = nil
+  #   end
+  # end
 
-  def execute_promotion(from, to)
-    color = piece_at(from).color
+  # def execute_promotion(from, to)
+  #   color = piece_at(from).color
 
-    input = nil
-    loop do
-      puts 'Promote to Queen, Rook, Knight or Bishop? Enter Q, R, K or B'
-      input = gets.chomp.downcase
-      break if %w[q r k b].include?(input)
+  #   input = nil
+  #   loop do
+  #     puts 'Promote to Queen, Rook, Knight or Bishop? Enter Q, R, K or B'
+  #     input = gets.chomp.downcase
+  #     break if %w[q r k b].include?(input)
 
-      puts 'Invalid input'
-    end
+  #     puts 'Invalid input'
+  #   end
 
-    pieces = { 'q' => Queen, 'r' => Rook, 'k' => Knight, 'b' => Bishop }
+  #   pieces = { 'q' => Queen, 'r' => Rook, 'k' => Knight, 'b' => Bishop }
 
-    @state[to[0]][to[1]] = pieces[input].new(color)
-    @state[from[0]][from[1]] = nil
-  end
+  #   @state[to[0]][to[1]] = pieces[input].new(color)
+  #   @state[from[0]][from[1]] = nil
+  # end
 
-  def execute_move(from, to)
-    piece = piece_at(from)
+  # def execute_move(from, to)
+  #   piece = piece_at(from)
 
-    # Handle castling moves
-    if piece.is_a?(King) && piece.castles?(from, to)
-      execute_castling(from, to)
+  #   # Handle castling moves
+  #   if piece.is_a?(King) && piece.castles?(from, to)
+  #     execute_castling(from, to)
 
-    # Handle en passant moves
-    elsif piece.is_a?(Pawn) && @en_passant_target == to
-      execute_en_passant(from, to)
+  #   # Handle en passant moves
+  #   elsif piece.is_a?(Pawn) && @en_passant_target == to
+  #     execute_en_passant(from, to)
 
-    # Handle pawn promotion
-    elsif piece.is_a?(Pawn) && [7, 0].include?(to[0])
-      execute_promotion(from, to)
+  #   # Handle pawn promotion
+  #   elsif piece.is_a?(Pawn) && [7, 0].include?(to[0])
+  #     execute_promotion(from, to)
 
-    # Handle standard moves
-    else
-      @state[to[0]][to[1]] = piece
-      @state[from[0]][from[1]] = nil
-    end
+  #   # Handle standard moves
+  #   else
+  #     @state[to[0]][to[1]] = piece
+  #     @state[from[0]][from[1]] = nil
+  #   end
 
-    # Update en passant target
-    if piece.is_a?(Pawn) && (from[0] - to[0]).abs == 2
-      update_en_passant_target(piece, from)
-    else
-      @en_passant_target = nil
-    end
+  #   # Update en passant target
+  #   if piece.is_a?(Pawn) && (from[0] - to[0]).abs == 2
+  #     update_en_passant_target(piece, from)
+  #   else
+  #     @en_passant_target = nil
+  #   end
 
-    # Revoke castling rights
-    update_castling_rights(from) if piece.is_a?(King) || piece.is_a?(Rook)
-  end
+  #   # Revoke castling rights
+  #   update_castling_rights(from) if piece.is_a?(King) || piece.is_a?(Rook)
+  # end
 
   def update_castling_rights(from)
     # Black
