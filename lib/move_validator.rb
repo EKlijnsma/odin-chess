@@ -127,7 +127,7 @@ class MoveValidator
     # Execute the move on a cloned board and evaluate if the king is in check
     color = @board.piece_at(from).color
     test_board = @board.deep_clone
-    MoveExecutor.new(test_board).execute_move(from, to)
+    MoveExecutor.new(test_board).execute_move(from, to, simulate: true)
     in_check?(color, test_board)
   end
 end
