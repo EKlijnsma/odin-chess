@@ -10,7 +10,7 @@ require_relative 'rook'
 
 class Board
   include BoardRenderer
-  attr_accessor :state, :en_passant_target
+  attr_accessor :state, :en_passant_target, :castling_rights
 
   def initialize
     @state = Array.new(8) { Array.new(8) }
@@ -50,7 +50,7 @@ class Board
     @state[from[0]][from[1]] = nil
     # remove enemy pawn (row 3 for black pieces, row 4 for white pieces)
     direction = pawn.color == :white ? -1 : 1
-    captured_row = to[0] + direction
+    captured_row = to[0] - direction
     @state[captured_row][to[1]] = nil
   end
 
@@ -150,112 +150,6 @@ class Board
     @castling_rights[:white_kingside] = false
   end
 
-  # def validate_selection(coords, player)
-  #   piece = piece_at(coords)
-  #   # if nil there is no piece here, otherwise verify that the piece is the same color as the player
-  #   piece.nil? ? false : piece.color == player.color
-  # end
-
-  # def validate_pawn_move(from, to)
-  #   moving_piece = piece_at(from)
-  #   target_piece = piece_at(to)
-
-  #   # Forward move
-  #   if from[1] == to[1]
-  #     return false unless target_piece.nil? && clear_path?(from, to)
-  #   elsif @en_passant_target == to
-  #   # Diagonal move
-  #   # ok for now, but cant return true before the results_in_check? validation
-  #   elsif target_piece.nil? || target_piece.color == moving_piece.color
-  #     return false
-  #   end
-  #   # For all moves: not valid if resulting in check
-  #   return false if results_in_check?(from, to)
-
-  #   true
-  # end
-
-  # def validate_castle(from, to)
-  #   castle_data = {
-  #     [7, 2] => { rook_pos: [7, 0], skipped_square: [7, 3], rights: :white_queenside },
-  #     [7, 6] => { rook_pos: [7, 7], skipped_square: [7, 5], rights: :white_kingside },
-  #     [0, 2] => { rook_pos: [0, 0], skipped_square: [0, 3], rights: :black_queenside },
-  #     [0, 6] => { rook_pos: [0, 7], skipped_square: [0, 5], rights: :black_kingside }
-  #   }
-
-  #   data = castle_data[to]
-  #   return false unless data
-
-  #   return false unless @castling_rights[data[:rights]] # If no longer has castling rights
-  #   return false if in_check?(piece_at(from).color) # If currently in check
-  #   return false unless clear_path?(from, data[:rook_pos]) # If pieces are still between king and rook
-  #   return false if results_in_check?(from, data[:skipped_square]) # If passing through check
-  #   return false if results_in_check?(from, to) # If ending up in check
-
-  #   # If all the above passes, its a valid castling move
-  #   true
-  # end
-
-  # def validate_destination(from, to)
-  #   piece = piece_at(from)
-
-  #   return false if piece.nil?
-  #   return validate_pawn_move(from, to) if piece.is_a?(Pawn)
-  #   return validate_castle(from, to) if piece.is_a?(King) && piece.castles?(from, to)
-
-  #   return false unless piece.targets(from).include?(to)
-  #   return false if friendly_fire?(from, to)
-  #   return false if piece.sliding? && !clear_path?(from, to)
-
-  #   return false if results_in_check?(from, to)
-
-  #   true
-  # end
-
-  # def results_in_check?(from, to)
-  #   # Execute the move on a cloned board and evaluate if the king is in check
-  #   clone = deep_clone
-  #   clone.execute_move(from, to)
-  #   color = piece_at(from).color
-  #   clone.in_check?(color)
-  # end
-
-  # def in_check?(color)
-  #   king_position = find_king(color)
-  #   enemy_color = (color == :white ? :black : :white)
-  #   get_all_targets(enemy_color).include?(king_position)
-  # end
-
-  # def get_all_targets(color)
-  #   mv = MoveValidator.new(self)
-  #   all_targets = []
-  #   @state.each_with_index do |row, i|
-  #     row.each_with_index do |piece, j|
-  #       next if piece.nil? || piece.color != color
-
-  #       piece.targets([i, j]).each do |target|
-  #         all_targets << target unless piece.sliding? && !mv.clear_path?([i, j], target)
-  #       end
-  #     end
-  #   end
-  #   all_targets
-  # end
-
-  # def get_all_moves(color)
-  #   mv = MoveValidator.new(self)
-  #   all_moves = []
-  #   @state.each_with_index do |row, i|
-  #     row.each_with_index do |piece, j|
-  #       next if piece.nil? || piece.color != color
-
-  #       piece.targets([i, j]).each do |target|
-  #         all_moves << [[i, j], target] unless piece.sliding? && !mv.clear_path?([i, j], target)
-  #       end
-  #     end
-  #   end
-  #   all_moves
-  # end
-
   def pieces(color)
     pieces = []
     @state.each_with_index do |row, i|
@@ -280,26 +174,6 @@ class Board
   def deep_clone
     Marshal.load(Marshal.dump(self))
   end
-
-  # def friendly_fire?(piece_coords, destination_coords)
-  #   moving_piece = piece_at(piece_coords)
-  #   target_piece = piece_at(destination_coords)
-
-  #   target_piece.nil? ? false : moving_piece.color == target_piece.color
-  # end
-
-  # def clear_path?(from, to)
-  #   # Leverage spaceship operator to get -1, 0 or +1 values to user as directions/vectors
-  #   vector = [to[0] <=> from[0], to[1] <=> from[1]]
-
-  #   position = from
-  #   loop do
-  #     position = [position[0] + vector[0], position[1] + vector[1]]
-  #     break if position == to
-  #     return false unless piece_at(position).nil?
-  #   end
-  #   true
-  # end
 
   def clear_board
     @state = Array.new(8) { Array.new(8) }

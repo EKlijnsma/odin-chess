@@ -132,42 +132,6 @@ class Game
     false
   end
 
-  # def has_legal_moves?(player)
-  #   moves = @board.get_all_moves(player.color)
-  #   moves.each do |move|
-  #     return true if @board.validate_destination(move[0], move[1])
-  #   end
-  #   false
-  # end
-
-  # def get_move(player)
-  #   piece_coords = select_valid_piece(player)
-  #   destination_coords = select_valid_destination(player, piece_coords)
-  #   [piece_coords, destination_coords]
-  # end
-
-  # def select_valid_piece(player)
-  #   loop do
-  #     input = player.select_piece
-  #     coords = notation_to_coords(input)
-  #     return coords if @board.validate_selection(coords, player)
-
-  #     Display.invalid_input('Invalid piece selection, try again.')
-  #   end
-  # end
-
-  # def select_valid_destination(player, piece_coords)
-  #   loop do
-  #     input = player.select_destination
-  #     return get_move(player) if input == 'cancel'
-
-  #     coords = notation_to_coords(input)
-  #     return coords if @board.validate_destination(piece_coords, coords)
-
-  #     Display.invalid_input('Invalid destination, try again or type "cancel" to select a different piece.')
-  #   end
-  # end
-
   def notation_to_coords(notation)
     file = notation[0]
     rank = notation[1]
