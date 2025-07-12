@@ -52,6 +52,7 @@ class Game
 
       # Execute
       MoveExecutor.new(@board).execute_move(move[0], move[1])
+      update_position_history
       @board.render
       break
     end

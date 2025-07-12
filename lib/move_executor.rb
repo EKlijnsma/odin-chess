@@ -11,9 +11,7 @@ class MoveExecutor
   end
 
   def execute_move(from, to, simulate: false)
-    puts "executing move from #{from} to #{to}"
     piece = @board.piece_at(from)
-    puts "piece at #{from} is: #{piece}"
 
     # Handle castling moves
     if piece.is_a?(King) && piece.castles?(from, to)
