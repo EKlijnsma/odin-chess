@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# Represents a generic piece (parent class) in the chess game.
+# Stores a symbol and color, holds movement constraints and does move validation
+# based on those constraints.
 class Piece
   attr_accessor :color, :symbol
 
@@ -12,14 +15,18 @@ class Piece
     raise NotImplementedError, 'Subclasses must implement possible_moves'
   end
 
-  def to_s
-    @symbol
-  end
-
   def valid_move?(piece_coords, destination_coords)
     row_delta = destination_coords[0] - piece_coords[0]
     col_delta = destination_coords[1] - piece_coords[1]
     possible_moves.include?([row_delta, col_delta])
+  end
+
+  def sliding?
+    false
+  end
+
+  def to_s
+    @symbol
   end
 
   def targets(position)
@@ -32,9 +39,5 @@ class Piece
       targets << [row, col]
     end
     targets
-  end
-
-  def sliding?
-    false
   end
 end
