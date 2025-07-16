@@ -28,6 +28,14 @@ class Piece
   def to_s
     @symbol
   end
+  
+  def to_json(*_args)
+    JSON.dump({
+      type: self.class.to_s,
+      symbol: @symbol,
+      color: @color.to_s
+    })
+  end    
 
   def targets(position)
     targets = []

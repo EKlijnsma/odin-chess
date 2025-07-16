@@ -98,4 +98,12 @@ class Board
   def place_piece(piece, square)
     @state[square[0]][square[1]] = piece
   end
+
+  def to_json(*_args)
+    JSON.dump({
+      state: @state.map { |row| row.map { |piece| piece.nil? ? nil : piece.to_json}},
+      en_passant_target: @en_passant_target,
+      castling_rights: @castling_rights
+    })
+  end 
 end

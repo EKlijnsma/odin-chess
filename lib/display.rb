@@ -8,16 +8,28 @@ module Display
     puts "\nCheckmate! #{winner.name} wins the game!"
   end
 
+  def self.options
+    puts "\nEnter 'P' to continue Playing, 'S' to Save and quit or 'Q' to Quit the game without saving"
+  end
+
+  def self.exit
+    '\nThank you for playing, the game will now exit'
+  end
+
+  def self.save
+    '\nGame Saved!'
+  end
+
   def self.announce_draw(reason)
     puts "\nThe game is a draw. (#{reason})"
   end
 
   def self.prompt_move(player)
-    puts "#{player}'s turn: "
+    puts "\n#{player}'s turn: "
   end
 
   def self.promotion
-    puts 'Promote to Queen, Rook, Knight or Bishop? Enter Q, R, K or B'
+    puts '\nPromote to Queen, Rook, Knight or Bishop? Enter Q, R, K or B'
   end
 
   def self.enter_square(reason)

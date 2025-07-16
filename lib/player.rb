@@ -25,6 +25,25 @@ class Player
     @name
   end
 
+  def to_json(*_args)
+    JSON.dump({
+      name: @name,
+      color: @color.to_s
+    })
+  end    
+
+  def game_control
+    input = nil
+    loop do
+      Display.options
+      input = gets.chomp.downcase
+      return input if %w[s q p].include?(input)
+
+      Display.invalid_input('please enter a valid option')
+    end
+    input
+  end
+  
   private
 
   def select_piece

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'json'
 require_relative 'player'
 require_relative 'board'
 require_relative 'display'
@@ -18,6 +19,35 @@ class Game
     @position_history = []
   end
 
+  def to_json(*_args)
+    JSON.dump({
+      board: @board.to_json,
+      player1: @player1.to_json,
+      player2: @player2.to_json,
+      current_player: @current_player.to_json,
+      position_history: @position_history.map do |snapshot|
+        snapshot.map do |key, value|
+          if key == :board
+              [key, value.map {|piece| piece.nil? ? nil : piece.to_json}]
+          else
+              [key, value]
+          end
+        end.to_h #convert mapped output back to a hash
+      end
+    })
+  end 
+
+  def save_game
+    # Write the JSON string to a file
+    File.write('saved_game.json', to_json)
+    Display.save
+  end
+
+  def terminate
+    Display.exit
+    exit
+  end
+
   def update_position_history
     snapshot = {
       board: @board.state.flatten,
@@ -32,10 +62,18 @@ class Game
     loop do
       @board.render
       Display.declare_check(@current_player) if MoveValidator.new(@board).in_check?(@current_player.color)
-      take_turn(@current_player)
-      break if game_over?
-
-      switch_players
+      option = @current_player.game_control
+      if option == 's'
+        save_game
+        terminate
+      elsif option == 'q'
+        terminate
+      else
+        take_turn(@current_player)
+        break if game_over?
+    
+        switch_players
+      end
     end
   end
 
