@@ -13,10 +13,48 @@ The assignment is fairly straightforward:
 Simple enough right?
 
 ## How to install
-To do
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/EKlijnsma/odin-chess.git
+   cd odin-chess
+
+2. **Make sure Ruby is installed:**   
+This project was developed using Ruby 3.3.0. It should work with older versions but you can check your version with:
+   ```bash
+   ruby -v
+
+3. **Playing the game:**  
+No external gems are required to play, just run the game directly as described below.
+
+4. **Running tests or linting (optional)**:    
+If you want to run the test suite (*remember it was not updated after refactoring*) or check code style with RuboCop, you’ll need to install dependencies:
+
+    ```bash
+    bundle install
 
 ## How to use
-To do
+1. **Start the game:**  
+From the project directory, run:
+    ```bash
+    ruby main.rb
+2. **Playing:**  
+Two human players take turns. To make a move, enter:   
+    - The square of the piece you want to move (e.g. e2)
+    - Then the destination square (e.g. e4)  
+
+    *Input is case-insensitive.*
+
+3. **Special commands (at any input prompt):**  
+    - S → Save the game
+    - Q → Quit the game without saving
+
+4. **Saving:**  
+The game is stored in a default file and overwrites any previously saved games.   
+After saving the game will automatically terminate
+
+5. **Loading a saved game:**  
+When the program starts, it will ask if you'd like to load the previously saved game, or start a new one
+
 
 ## Reflection
 This project was a really bumpy ride for me. Partially because it the assignment page was right in stating that:
@@ -80,6 +118,13 @@ Although it feels very vulnerable to move stuff around and I felt like completel
 
 It also clicked much more now how the separations could be handled and it was the first time I used more abstract classes like MoveValidator and MoveExecuter that are not reflecting a physical thing like a piece or a board. 
 
+Implementation of (de)serialization was fairly straightforward when looking back at the Hangman implementation. 
+There were some hickups especially with deserializing, but I got over that quickly enough. 
+
+Eventually I made some minor improvements to the User Experience and cleaned up the code a bit with making methods private and some additional comments.
+
+What I did not do anymore is update the spec files after refactoring. It felt like a waste of time and energy since the game was already running as intended.
+Testing really helped me in the early stages of the project, but did no longer feel useful after a certain point in the process.
 
 ### Key takeaways
 Overall I am very happy that I came back to this project instead of bailing out and starting another course. 
