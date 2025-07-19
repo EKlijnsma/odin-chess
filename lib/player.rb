@@ -15,8 +15,11 @@ class Player
 
   def prompt_move
     from = select_piece
+    return from if %w[s q].include?(from)
+
     to = select_destination
     return prompt_move if to == 'cancel'
+    return to if %w[s q].include?(to)
 
     [from, to]
   end
@@ -64,9 +67,9 @@ class Player
       Display.prompt_move(self)
       Display.enter_square('select')
       input = gets.chomp.downcase
-      return input if chess_square?(input)
+      return input if chess_square?(input) || %w[s q].include?(input)
 
-      Display.invalid_input('please enter a square like "e2".')
+      Display.invalid_input('please enter a square like "e2" to select a piece (or S / Q to Save / Quit).')
     end
     input
   end
@@ -78,7 +81,7 @@ class Player
       input = gets.chomp.downcase
       return input if chess_square?(input) || input == 'cancel'
 
-      Display.invalid_input('please enter a valid square or "cancel".')
+      Display.invalid_input('please enter a valid square or "cancel" (or S / Q to Save / Quit).')
     end
     input
   end

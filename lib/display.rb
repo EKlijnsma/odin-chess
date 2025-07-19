@@ -39,9 +39,9 @@ module Display
   def self.enter_square(reason)
     case reason
     when 'select'
-      puts 'Select one of your pieces by entering its square (e.g. "e2"):'
+      puts 'Select a piece (or S to Save or Q to quit):'
     when 'destination'
-      puts 'Select a destination square (e.g. "e4"), or type "cancel" to select a different piece:'
+      puts 'Select a destination (or type "cancel" to select a different piece):'
     end
   end
 

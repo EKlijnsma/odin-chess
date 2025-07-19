@@ -54,18 +54,10 @@ class Game
     loop do
       @board.render
       Display.declare_check(@current_player) if MoveValidator.new(@board).in_check?(@current_player.color)
-      option = @current_player.game_control
-      if option == 's'
-        save_game
-        terminate
-      elsif option == 'q'
-        terminate
-      else
-        take_turn(@current_player)
-        break if game_over?
+      take_turn(@current_player)
+      break if game_over?
 
-        switch_players
-      end
+      switch_players
     end
   end
 
@@ -110,6 +102,8 @@ class Game
     loop do
       # Prompt player input and convert to coordinates
       input = player.prompt_move
+      save_game if input == 's'
+      terminate if %w[s q].include?(input)
       from = notation_to_coords(input[0])
       to = notation_to_coords(input[1])
       move = [from, to]
