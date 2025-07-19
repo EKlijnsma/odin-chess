@@ -2,6 +2,7 @@
 
 require_relative 'display'
 
+# Contains logic concerning the generation of movement on the board
 class MoveGenerator
   attr_accessor :board
 

@@ -2,6 +2,9 @@
 
 require_relative 'piece'
 
+# Subclass of Piece, represents the pawn piece, holding all possible moves including directions
+# Since pawns only move towards the opponent player
+# Overrides targets method inherited by Piece superclass
 class Pawn < Piece
   def assign_symbol
     color == :white ? '♙' : '♟'
@@ -20,6 +23,8 @@ class Pawn < Piece
     ]
   end
 
+  # Returns the targets the piece can potentially have based on its current position
+  # without considering any board context limitations
   def targets(position)
     targets = []
     possible_moves.each do |vector|

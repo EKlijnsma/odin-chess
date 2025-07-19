@@ -4,6 +4,7 @@ require_relative 'display'
 require_relative 'move_generator'
 require_relative 'move_executor'
 
+# Contains logic concerning the full movement validation on the given board
 class MoveValidator
   attr_accessor :board
 
@@ -42,7 +43,7 @@ class MoveValidator
     MoveGenerator.new(board).all_targets(enemy_color).include?(king_position)
   end
 
-  def has_legal_moves?(color)
+  def legal_moves?(color)
     moves = MoveGenerator.new(@board).all_moves(color)
     moves.each do |move|
       return true if valid_destination?(move[0], move[1])

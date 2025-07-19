@@ -15,9 +15,11 @@ class Piece
     raise NotImplementedError, 'Subclasses must implement possible_moves'
   end
 
-  def valid_move?(piece_coords, destination_coords)
-    row_delta = destination_coords[0] - piece_coords[0]
-    col_delta = destination_coords[1] - piece_coords[1]
+  # Returns a boolean indicating whether a move is valid based on the pieces'
+  # movement constraints.
+  def valid_move?(from, to)
+    row_delta = to[0] - from[0]
+    col_delta = to[1] - from[1]
     possible_moves.include?([row_delta, col_delta])
   end
 
@@ -45,6 +47,8 @@ class Piece
     instance
   end
 
+  # Returns the targets the piece can potentially have based on its current position
+  # without considering any board context limitations
   def targets(position)
     targets = []
     possible_moves.each do |vector|

@@ -2,6 +2,7 @@
 
 require_relative 'piece'
 
+# Subclass of Piece, represents the knight piece, holding all possible moves
 class Knight < Piece
   def assign_symbol
     color == :white ? '♘' : '♞'

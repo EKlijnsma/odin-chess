@@ -2,6 +2,7 @@
 
 require_relative 'piece'
 
+# Subclass of Piece, represents the bishop piece, holding all possible moves and acts as sliding piece
 class Rook < Piece
   def assign_symbol
     color == :white ? '♖' : '♜'

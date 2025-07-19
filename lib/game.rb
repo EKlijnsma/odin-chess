@@ -8,6 +8,8 @@ require_relative 'move_validator'
 require_relative 'move_generator'
 require_relative 'move_executor'
 
+# Represents the game class, holding the board and 2 players, keeps track of the current player
+# and a history of positions. Contains the game logic like the game play loop, and end-of-game checks
 class Game
   attr_accessor :player1, :player2, :board, :current_player
 
@@ -48,27 +50,6 @@ class Game
     instance
   end
 
-  def save_game
-    # Write the JSON string to a file
-    File.write('saved_game.json', to_json)
-    Display.save
-  end
-
-  def terminate
-    Display.exit
-    exit
-  end
-
-  def update_position_history
-    snapshot = {
-      board: @board.state.flatten,
-      turn: @current_player,
-      castling: @board.castling_rights,
-      en_passant: @board.en_passant_target
-    }
-    @position_history << snapshot
-  end
-
   def play
     loop do
       @board.render
@@ -90,6 +71,28 @@ class Game
 
   private
 
+  # Adds a snapshot of the current position to the history
+  def update_position_history
+    snapshot = {
+      board: @board.state.flatten,
+      turn: @current_player,
+      castling: @board.castling_rights,
+      en_passant: @board.en_passant_target
+    }
+    @position_history << snapshot
+  end
+
+  def save_game
+    # Write the JSON string to a file
+    File.write('saved_game.json', to_json)
+    Display.save
+  end
+
+  def terminate
+    Display.exit
+    exit
+  end
+
   def self.rebuild_position_history(array)
     array.map do |snapshot|
       {
@@ -105,14 +108,16 @@ class Game
 
   def take_turn(player)
     loop do
-      input = player.get_move
+      # Prompt player input and convert to coordinates
+      input = player.prompt_move
       from = notation_to_coords(input[0])
       to = notation_to_coords(input[1])
       move = [from, to]
 
+      # Prompt again, unless the move is valid for the current player
       next unless MoveValidator.new(@board).valid_move?(move[0], move[1], player.color)
 
-      # Execute
+      # Execute the move, update the history and render the new board
       MoveExecutor.new(@board).execute_move(move[0], move[1])
       update_position_history
       @board.render
@@ -148,13 +153,15 @@ class Game
   end
 
   def stalemate?(player)
+    # Stalemate means there are no legal moves but the king is not in check
     mv = MoveValidator.new(@board)
-    !mv.in_check?(player.color) && !mv.has_legal_moves?(player.color)
+    !mv.in_check?(player.color) && !mv.legal_moves?(player.color)
   end
 
   def checkmate?(player)
+    # Checkmate means there are no legal moves and the king is in check
     mv = MoveValidator.new(@board)
-    mv.in_check?(player.color) && !mv.has_legal_moves?(player.color)
+    mv.in_check?(player.color) && !mv.legal_moves?(player.color)
   end
 
   def threefold_repetition?
@@ -184,6 +191,8 @@ class Game
     false
   end
 
+  # Get the white and black bishops, and if only 1 from each color is present
+  # check if they are on the same colored squares.
   def same_colored_bishops?(white, black)
     white_bishops = white.filter { |p| p[:piece].is_a?(Bishop) }
     black_bishops = black.filter { |p| p[:piece].is_a?(Bishop) }
@@ -208,4 +217,6 @@ class Game
 
     [row, col]
   end
+
+  private_class_method :rebuild_position_history
 end

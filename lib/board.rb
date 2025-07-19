@@ -8,6 +8,9 @@ require_relative 'pawn'
 require_relative 'queen'
 require_relative 'rook'
 
+# Represents the board, holding a state, which is a 2D array representing the squares
+# and keeps track of en passant opportunities and castling rights. Has methods returning the
+# position of the king of a given color, or all pieces from a given color, etc.
 class Board
   include BoardRenderer
   attr_accessor :state, :en_passant_target, :castling_rights
@@ -22,19 +25,6 @@ class Board
       black_queenside: true
     }
     set_up_pieces
-  end
-
-  def set_up_pieces
-    back_rank = [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook]
-    back_rank.each_with_index do |piece_class, col|
-      @state[0][col] = piece_class.new(:black)
-      @state[7][col] = piece_class.new(:white)
-    end
-
-    8.times do |col|
-      @state[1][col] = Pawn.new(:black)
-      @state[6][col] = Pawn.new(:white)
-    end
   end
 
   def piece_at(coords)
@@ -91,10 +81,6 @@ class Board
     Marshal.load(Marshal.dump(self))
   end
 
-  def clear_board
-    @state = Array.new(8) { Array.new(8) }
-  end
-
   def place_piece(piece, square)
     @state[square[0]][square[1]] = piece
   end
@@ -124,13 +110,6 @@ class Board
     instance
   end
 
-  def self.rebuild_castling_rights(data)
-    { white_kingside: data['white_kingside'],
-      white_queenside: data['white_queenside'],
-      black_kingside: data['black_kingside'],
-      black_queenside: data['black_queenside'] }
-  end
-
   def self.resolve_piece_class(type_string)
     mapping = {
       'Rook' => Rook,
@@ -143,4 +122,32 @@ class Board
 
     mapping[type_string]
   end
+
+  private
+
+  def set_up_pieces
+    back_rank = [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook]
+    back_rank.each_with_index do |piece_class, col|
+      @state[0][col] = piece_class.new(:black)
+      @state[7][col] = piece_class.new(:white)
+    end
+
+    8.times do |col|
+      @state[1][col] = Pawn.new(:black)
+      @state[6][col] = Pawn.new(:white)
+    end
+  end
+
+  def clear_board
+    @state = Array.new(8) { Array.new(8) }
+  end
+
+  def self.rebuild_castling_rights(data)
+    { white_kingside: data['white_kingside'],
+      white_queenside: data['white_queenside'],
+      black_kingside: data['black_kingside'],
+      black_queenside: data['black_queenside'] }
+  end
+
+  private_class_method :rebuild_castling_rights
 end

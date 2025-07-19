@@ -2,6 +2,8 @@
 
 require_relative 'piece'
 
+# Subclass of Piece, represents the king piece, holding all possible regular moves
+# and has castle checking method
 class King < Piece
   def assign_symbol
     color == :white ? '♔' : '♚'
@@ -14,6 +16,7 @@ class King < Piece
     ]
   end
 
+  # Returns a boolean indicating whether the move is a castling move or not
   def castles?(from, to)
     if color == :white
       from == [7, 4] && [[7, 2], [7, 6]].include?(to)

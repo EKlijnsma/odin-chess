@@ -3,6 +3,7 @@
 require_relative 'display'
 require_relative 'move_generator'
 
+# Contains logic concerning move execution on the board
 class MoveExecutor
   attr_accessor :board
 

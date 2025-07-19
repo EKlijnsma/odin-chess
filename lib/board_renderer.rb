@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# Module takes care of rendering the board to the terminal
+# Nothing fancy, just very functional
 module BoardRenderer
   def render
     clear_screen
@@ -18,7 +20,7 @@ module BoardRenderer
     puts `clear`
   end
 
-  def print_row(rank, i)
+  def print_row(rank, i) # rubocop:disable Naming/MethodParameterName
     # print the rank label and the contents of each square (either the piece or nothing)
     string = "#{8 - i} |"
     rank.each do |piece|

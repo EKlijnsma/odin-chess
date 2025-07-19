@@ -78,9 +78,9 @@ describe Game do
       expect(game.select_valid_destination(player1, piece_coords)).to eq([4, 4])
     end
 
-    it 'calls get_move again when input is cancel' do
+    it 'calls prompt_move again when input is cancel' do
       allow(player1).to receive(:select_destination).and_return('cancel')
-      expect(game).to receive(:get_move).with(player1)
+      expect(game).to receive(:prompt_move).with(player1)
 
       game.select_valid_destination(player1, piece_coords)
     end
