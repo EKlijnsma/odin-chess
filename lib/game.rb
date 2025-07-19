@@ -21,27 +21,27 @@ class Game
 
   def to_json(*_args)
     JSON.dump({
-      board: @board.to_json,
-      player1: @player1.to_json,
-      player2: @player2.to_json,
-      current_player: @current_player.to_json,
-      position_history: @position_history.map do |snapshot|
-        snapshot.map do |key, value|
-          if key == :board
-              [key, value.map {|piece| piece.nil? ? nil : piece.to_json}]
-          else
-              [key, value]
-          end
-        end.to_h #convert mapped output back to a hash
-      end
-    })
-  end 
+                board: @board.to_json,
+                player1: @player1.to_json,
+                player2: @player2.to_json,
+                current_player: @current_player.to_json,
+                position_history: @position_history.map do |snapshot|
+                  snapshot.map do |key, value|
+                    if key == :board
+                      [key, value.map { |piece| piece.nil? ? nil : piece.to_json }]
+                    else
+                      [key, value]
+                    end
+                  end.to_h # convert mapped output back to a hash
+                end
+              })
+  end
 
   def self.from_json(string)
     data = JSON.parse(string)
     instance = allocate
     instance.instance_variable_set(:@board, Board.from_json(data['board']))
-    instance.instance_variable_set(:@player1, Player.from_json(data['player1'])) 
+    instance.instance_variable_set(:@player1, Player.from_json(data['player1']))
     instance.instance_variable_set(:@player2, Player.from_json(data['player2']))
     instance.instance_variable_set(:@current_player, Player.from_json(data['current_player']))
     instance.instance_variable_set(:@position_history, rebuild_position_history(data['position_history']))
@@ -68,7 +68,7 @@ class Game
     }
     @position_history << snapshot
   end
-  
+
   def play
     loop do
       @board.render
@@ -82,7 +82,7 @@ class Game
       else
         take_turn(@current_player)
         break if game_over?
-    
+
         switch_players
       end
     end
@@ -93,7 +93,9 @@ class Game
   def self.rebuild_position_history(array)
     array.map do |snapshot|
       {
-        board: snapshot['board'].map { |piece_data| piece_data.nil? ? nil : Board.resolve_piece_class(JSON.parse(piece_data)['type']).from_json(piece_data) },
+        board: snapshot['board'].map do |piece_data|
+          piece_data.nil? ? nil : Board.resolve_piece_class(JSON.parse(piece_data)['type']).from_json(piece_data)
+        end,
         turn: Player.from_hash(snapshot['turn']),
         castling: snapshot['castling'].transform_keys(&:to_sym),
         en_passant: snapshot['en_passant']

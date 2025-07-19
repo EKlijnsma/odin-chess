@@ -28,15 +28,15 @@ class Piece
   def to_s
     @symbol
   end
-  
+
   def to_json(*_args)
     JSON.dump({
-      type: self.class.to_s,
-      symbol: @symbol,
-      color: @color.to_s
-    })
-  end  
-  
+                type: self.class.to_s,
+                symbol: @symbol,
+                color: @color.to_s
+              })
+  end
+
   def self.from_json(string)
     data = JSON.parse(string)
     instance = allocate

@@ -11,7 +11,7 @@ module Display
   def self.options
     puts "\nEnter 'P' to continue Playing, 'S' to Save and quit or 'Q' to Quit the game without saving"
   end
-  
+
   def self.start
     puts "\nEnter 'L' to Load the latest game or 'N' to start a New game: "
   end

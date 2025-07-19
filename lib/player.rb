@@ -27,10 +27,10 @@ class Player
 
   def to_json(*_args)
     JSON.dump({
-      name: @name,
-      color: @color.to_s
-    })
-  end    
+                name: @name,
+                color: @color.to_s
+              })
+  end
 
   def self.from_json(string)
     data = JSON.parse(string)
@@ -43,7 +43,7 @@ class Player
   def self.from_hash(hash)
     new(hash['name'], hash['color'].to_sym)
   end
-  
+
   def game_control
     input = nil
     loop do
@@ -55,7 +55,7 @@ class Player
     end
     input
   end
-  
+
   private
 
   def select_piece

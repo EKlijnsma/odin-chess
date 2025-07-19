@@ -18,10 +18,10 @@ loop do
   Display.invalid_input('please enter a valid option')
 end
 
-if input == 'n'
-  game = Game.new(board, white, black)
-else
-  game = Game.from_json(File.read('saved_game.json'))
-end
+game = if input == 'n'
+         Game.new(board, white, black)
+       else
+         Game.from_json(File.read('saved_game.json'))
+       end
 
 game.play
