@@ -37,6 +37,17 @@ class Game
     })
   end 
 
+  def self.from_json(string)
+    data = JSON.parse(string)
+    instance = allocate
+    instance.instance_variable_set(:@board, Board.from_json(data['board']))
+    instance.instance_variable_set(:@player1, Player.from_json(data['player1'])) 
+    instance.instance_variable_set(:@player2, Player.from_json(data['player2']))
+    instance.instance_variable_set(:@current_player, Player.from_json(data['current_player']))
+    instance.instance_variable_set(:@position_history, rebuild_position_history(data['position_history']))
+    instance
+  end
+
   def save_game
     # Write the JSON string to a file
     File.write('saved_game.json', to_json)
@@ -57,7 +68,7 @@ class Game
     }
     @position_history << snapshot
   end
-
+  
   def play
     loop do
       @board.render
@@ -78,6 +89,17 @@ class Game
   end
 
   private
+
+  def self.rebuild_position_history(array)
+    array.map do |snapshot|
+      {
+        board: snapshot['board'].map { |piece_data| piece_data.nil? ? nil : Board.resolve_piece_class(JSON.parse(piece_data)['type']).from_json(piece_data) },
+        turn: Player.from_hash(snapshot['turn']),
+        castling: snapshot['castling'].transform_keys(&:to_sym),
+        en_passant: snapshot['en_passant']
+      }
+    end
+  end
 
   def take_turn(player)
     loop do

@@ -35,7 +35,15 @@ class Piece
       symbol: @symbol,
       color: @color.to_s
     })
-  end    
+  end  
+  
+  def self.from_json(string)
+    data = JSON.parse(string)
+    instance = allocate
+    instance.instance_variable_set(:@color, data['color'].to_sym)
+    instance.instance_variable_set(:@symbol, data['symbol'])
+    instance
+  end
 
   def targets(position)
     targets = []

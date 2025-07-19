@@ -32,6 +32,18 @@ class Player
     })
   end    
 
+  def self.from_json(string)
+    data = JSON.parse(string)
+    instance = allocate
+    instance.instance_variable_set(:@name, data['name'])
+    instance.instance_variable_set(:@color, data['color'].to_sym)
+    instance
+  end
+
+  def self.from_hash(hash)
+    new(hash['name'], hash['color'].to_sym)
+  end
+  
   def game_control
     input = nil
     loop do

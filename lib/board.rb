@@ -106,4 +106,43 @@ class Board
       castling_rights: @castling_rights
     })
   end 
+
+  def self.from_json(string)
+    data = JSON.parse(string)
+    instance = allocate
+    instance.instance_variable_set(:@en_passant_target, data['en_passant_target'])
+    instance.instance_variable_set(:@castling_rights, rebuild_castling_rights(data['castling_rights']))
+    instance.instance_variable_set(:@state, data['state'].map do |row| 
+      row.map do |piece_data|
+        next if piece_data.nil?
+        parsed_piece = JSON.parse(piece_data)
+        resolve_piece_class(parsed_piece['type']).from_json(piece_data)
+      end
+    end)
+    
+    instance
+  end
+
+  private
+
+  def self.rebuild_castling_rights(data)
+    { white_kingside: data['white_kingside'],
+      white_queenside: data['white_queenside'],
+      black_kingside: data['black_kingside'],
+      black_queenside: data['black_queenside']
+    }
+  end
+
+  def self.resolve_piece_class(type_string)
+    mapping = {
+      'Rook' => Rook,
+      'Bishop' => Bishop,
+      'Knight' => Knight,
+      'King' => King,
+      'Queen' => Queen,
+      'Pawn' => Pawn,
+    }
+
+    mapping[type_string]
+  end
 end
